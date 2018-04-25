@@ -1,14 +1,14 @@
 export CC = gcc
-export CFLAGS = -g -Wall -W -I/usr/include/SDL
+export CFLAGS = -g -Wall -W -I /usr/include/SDL -I libfractal
 LIB_DIR = libfractal
 LIB = ./libfractal/libfractal.a
 EXE = main
 
 main: main.o lib
-	$(CC) -o $@ $< $(LIB)
+	@$(CC) -o $@ $< $(LIB)
 
 main.o: main.c lib
-	$(CC) -o $@ -c $< $(CFLAGS)
+	@$(CC) -o $@ -c $< $(CFLAGS)
 
 .PHONY: lib clean tests
 
@@ -16,7 +16,7 @@ lib:
 	@(cd $(LIB_DIR) && $(MAKE))
 
 clean:
-	(rm -rf *.o $(EXE) && cd $(LIB_DIR) && rm -rf *.o *.a)
+	@(rm -rf *.o $(EXE) && cd $(LIB_DIR) && rm -rf *.o *.a)
 	
 tests:
 	//A completer
