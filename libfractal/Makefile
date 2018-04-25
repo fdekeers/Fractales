@@ -13,3 +13,8 @@ $(LIBFILE): $(OBJ)
 
 *.o:
 	$(CC) -o $@ -c $< $(CFLAGS)
+
+.PHONY: clean
+
+clean:
+	@rm -rf *.o *.a
