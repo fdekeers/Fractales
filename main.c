@@ -6,6 +6,6 @@
 int main()
 {
     /* TODO */
-
+	printf("Coucou les zamis\n");
     return 0;
 }

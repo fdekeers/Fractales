@@ -1,5 +1,5 @@
 export CC = gcc
-export CFLAGS = -g -Wall -W -I /usr/include/SDL -I libfractal
+export CFLAGS = -g -Wall -W -lpthread -I /usr/include/SDL -I libfractal
 LIB_DIR = libfractal
 LIB = ./libfractal/libfractal.a
 EXE = main
