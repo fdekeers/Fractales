@@ -3,6 +3,7 @@
 #include <unistd.h>
 #include "fractal.h"
 #include <semaphore.h>
+#include <fcnt1.h>
 
 int main()
 {
@@ -66,6 +67,40 @@ void reader (){
         tab = strtok(NULL, ' ');
     }
 }
+
+// Lecture d'une ligne
+char* readline(int fd){
+	char line;
+	char buf;
+	ssize_t size = read(fd, (void*)&buf, sizeof(char));
+	if(*buf == '\n' || *buf == '#'){
+		return NULL;
+	}
+	for(int i = 0; i<1000; i++){
+		size = read(fd, (void*)((&buf)+i), sizeof(char);
+		if(*(buf+i+1) == '\n'){
+			return &buf;
+		}
+	}
+	return NULL;
+}
+
+// Creation d'une fractale sur base d'une ligne
+struct fractal* create_fractal(*char line){
+	int i = 0;
+	struct fractal *fractal = (struct fractal*)malloc(sizeof(struct fractal));
+	char* delim = " ";
+	char* token;
+	char* attr[];
+	token = strtok(line, delim);
+	while(token != NULL) {
+		attr[i] = token;
+		token = strtok(NULL, delim);
+	}
+	fractal = fractal_new(attr[0],attr[1],attr[2],attr[3],attr[4]); //il faut caster
+	return fractal;
+}
+
 
 // Calcul
 void calculer (){
