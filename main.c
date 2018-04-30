@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <unistd.h>
 #include "fractal.h"
+#include <semaphore.h>
 
 int main()
 {
