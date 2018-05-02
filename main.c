@@ -4,6 +4,7 @@
 #include "fractal.h"
 #include <semaphore.h>
 #include <fcntl.h>
+#include <string.h>
 #define ERROR = 1
 
 int main()
@@ -87,19 +88,17 @@ char* readline(FILE* stream){
 }
 
 // Creation d'une fractale sur base d'une ligne
+// OK !
 struct fractal* create_fractal(*char line){
-	int i = 0;
-	struct fractal *fractal = (struct fractal*)malloc(sizeof(struct fractal));
+	int i = 1;
 	char* delim = " ";
-	char* token;
-	char* attr[];
-	token = strtok(line, delim);
-	while(token != NULL) {
-		attr[i] = token;
-		token = strtok(NULL, delim);
+	char* attr[5];
+	attr[0] = strtok(line,delim);
+	while(i<5){
+		attr[i] = strtok(NULL,delim);
+		i++;
 	}
-	fractal = fractal_new(attr[0],attr[1],attr[2],attr[3],attr[4]); //il faut caster
-	return fractal;
+	return fractal_new(attr[0],atoi(attr[1]),atoi(attr[2]),atof(attr[3]),atof(attr[4]));
 }
 
 

@@ -1,39 +1,22 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
+#include <semaphore.h>
 #include <fcntl.h>
+#include <string.h>
 
 int main(int argc, char *argv[]) {
-	char* filename = argv[1];
-	int i = 0;
-	printf("L'argument est : %s\n",filename);
-	printf("Succès de la fonction malloc\n");
-	FILE* stream = fopen(filename,"r");
-	if(stream == NULL){
-		printf("Erreur dans la fonction fopen\n");
-		return 1;
-	}
-	printf("Succès de la fonction fopen\n");
-	char* buf = (char*)malloc(sizeof(char)*84);
-	if(buf == NULL){
-		printf("Erreur readline/malloc\n");
-		return 1;
-	}
-	char temp = fgetc(stream);
-	while(temp != '\n'){
-		*(buf+i) = temp;
-		temp = fgetc(stream);
+	int i = 1;
+	char* line = argv[1];
+	printf("Argument : %s\n",line);
+	char* delim = " ";
+	char* attr[5];
+	attr[0] = strtok(line,delim);
+	printf("Premier attribut : %s\n",attr[0]);
+	while(i<5){
+		attr[i] = strtok(NULL,delim);
+		printf("Attribut %i : %s\n",i+1,attr[i]);
 		i++;
 	}
-	printf("Ligne lue : %s\n",buf);
-	int err = fclose(stream);
-	if(err != 0){
-		printf("Erreur dans la fonction fclose\n");
-		free(buf);
-		return 1;
-	}
-	printf("Succès de la fonction fclose\n");
-	free(buf);
-	printf("Succès de la fonction free\n");
 	return 0;
 }
