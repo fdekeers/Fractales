@@ -3,7 +3,8 @@
 #include <unistd.h>
 #include "fractal.h"
 #include <semaphore.h>
-#include <fcnt1.h>
+#include <fcntl.h>
+#define ERROR = 1
 
 int main()
 {
@@ -68,21 +69,21 @@ void reader (){
     }
 }
 
-// Lecture d'une ligne
-char* readline(int fd){
-	char line;
-	char buf;
-	ssize_t size = read(fd, (void*)&buf, sizeof(char));
-	if(*buf == '\n' || *buf == '#'){
-		return NULL;
+// Lecture d'une ligne sur un fichier
+// OK !
+char* readline(FILE* stream){
+	char* buf = (char*)malloc(sizeof(char)*84);
+	if(buf == NULL){
+		printf("Erreur readline/malloc\n");
+		return 1;
 	}
-	for(int i = 0; i<1000; i++){
-		size = read(fd, (void*)((&buf)+i), sizeof(char);
-		if(*(buf+i+1) == '\n'){
-			return &buf;
-		}
+	char temp = fgetc(stream);
+	while(temp != '\n'){
+		*(buf+i) = temp;
+		temp = fgetc(stream);
+		i++;
 	}
-	return NULL;
+	return buf;
 }
 
 // Creation d'une fractale sur base d'une ligne
