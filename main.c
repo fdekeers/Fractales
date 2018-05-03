@@ -2,17 +2,11 @@
 #include <stdlib.h>
 #include <unistd.h>
 #include "fractal.h"
+#include <pthread.h>
 #include <semaphore.h>
 #include <fcntl.h>
 #include <string.h>
 #define ERROR = 1
-
-int main()
-{
-    /* TODO */
-	printf("Coucou les zamis\n");
-    return 0;
-}
 
 // Initialisations
 struct fractal buffer = (struct fractal)malloc(sizeof(struct fractal) * maxthreads);
@@ -22,7 +16,29 @@ sem_t empty; // Sert a compter le nombre de slots qui sont vides dans le buffer 
 sem_t full; // Sert a compter le nombre de slots qui sont remplis dans le buffer partagé
 pthread_mutex_init(&mutex,NULL);
 sem_init(&empty,maxthreads); // Initialisé à la longueur du buffer
-sem_init(&full,0); // Initialisé à 0
+sem_init(&full,0); // Initialisé à
+
+int main()
+{
+    pthread_t * thread;
+    pthread_attr_t * attr;
+    int retour_thread = pthread_create(thread, attr,void *(*start_routine) (void *), void *arg);
+    if (retour_thread != 0){
+        printf("Erreur lors de la création du thread");
+    }
+    else {
+        for(int i=0; i<maxthreads;i++){
+            if (buffer[i]!=0){ // Si une case du buffer contient une fractale, le thread va s'en charger et ensuite remettre la case a 0
+                write bitmap sdl(const struct fractal *f, const char *fname); // Arguments à definir
+                buffer[i]=0;
+            }
+            else { // Si une case du buffer vaut 0, on passe a la suivante sans rien faire jusqu'a tomber sur une fractale
+                break;
+            }
+        }
+    }
+    return 0;
+}
 
 // Threads de lecture
 void producteur (){
@@ -103,17 +119,12 @@ struct fractal* create_fractal(*char line){
 
 
 // On compare 2 fractales pour savoir laquelle a la plus grande valeur, si on applique cette fonction sur l'entierete d'un tableau, on peut trouver le max de toutes les fractales.
-void max_fractale (struct fractal *f1, struct fractal *f2){
+void max_fractale (struct fractal *f1){
     int max; // Fractale max
     int nbr_iter1 = fractal_compute_value(f1,f1->a,f1->b); // Nombre d'iterations de la valeur de recurrence sur la fractale
-    int nbr_iter2 = fractal_compute_value(f2,f2->a,f2->b);
-    long valeur_f1 = f1->values/nbr_iter1;
-    long valeur_f2 = f2->values/nbr_iter2;
+    long valeur_f1 = fractal_get_value(f1,f1->a,f1->b)/nbr_iter1;
     if (valeur_f1 > max){
         max = valeur_f1;
-    }
-    else if (valeur_f2 > f2){
-        max = valeur_f2;
     }
     else
         max = max;
@@ -129,7 +140,7 @@ void moyenne (){
     for (int i=0; ;i++){
         int nbr_iter = fractal_compute_value(f[i],f[i]->a,f[i]->b);
         somme_iter += nbr_iter;
-        somme_values += f[i]->values;
+        somme_values += fractal_get_value(f[i],f[i]->a,f[i]->b);
     }
     moyenne = somme_values/somme_iter;
 }
