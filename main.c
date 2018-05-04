@@ -9,59 +9,67 @@
 #define ERROR = 1
 
 // Initialisations
-struct fractal buffer = (struct fractal)malloc(sizeof(struct fractal) * maxthreads);
-struct fractal fract_table [1000];
+struct fractal *buffer[10];
 pthread_mutex_t mutex;
-sem_t empty; // Sert a compter le nombre de slots qui sont vides dans le buffer partagé
-sem_t full; // Sert a compter le nombre de slots qui sont remplis dans le buffer partagé
 pthread_mutex_init(&mutex,NULL);
-sem_init(&empty,maxthreads); // Initialisé à la longueur du buffer
-sem_init(&full,0); // Initialisé à
+sem_t empty;
+sem_init(&empty,0,10);
+sem_t full;
+sem_init(&full,0,0);
 
-int main()
+
+int main(int argc, char *argv[])
 {
-    pthread_t * thread;
-    pthread_attr_t * attr;
-    int retour_thread = pthread_create(thread, attr,void *(*start_routine) (void *), void *arg);
+	char* destination = argv[argc-1];
+	int d = 0;
+	int maxthreads;
+	for(int i = 1;i<argc;i++){
+		if(argv[i] == "-d"){
+			d = 1;
+		}
+		if(argv[i] == "--maxthreads"){
+			maxthreads = atoi(argv[i+1]);
+		}
+	}
+	pthread_t thread;
+    int retour_thread = pthread_create(&thread,NULL,void *(*start_routine) (void *), void *arg);
     if (retour_thread != 0){
-        printf("Erreur lors de la création du thread");
+        printf("Erreur lors de la création du thread\n");
     }
-    else {
-        for(int i=0; i<maxthreads;i++){
-            if (buffer[i]!=0){ // Si une case du buffer contient une fractale, le thread va s'en charger et ensuite remettre la case a 0
-                write bitmap sdl(const struct fractal *f, const char *fname); // Arguments à definir
-                buffer[i]=0;
-            }
-            else { // Si une case du buffer vaut 0, on passe a la suivante sans rien faire jusqu'a tomber sur une fractale
-                break;
-            }
-        }
-    }
-    return 0;
+	return 0;
 }
 
 // Threads de lecture
-void producteur (){
-    char lecture;
-    while (true){
-        sem_wait(&empty);
-        pthread_mutex_lock(&mutex);
-        // Section critique
-        readline();
-        pthread_mutex_unlock(&mutex);
+int producteur(char* filename){
+    FILE *stream = fopen(filename,"r");
+	if(stream == NULL){
+		return 1;
+	}
+	char* line = (char*)malloc(sizeof(char)*100);
+	if(buf == NULL){
+		return 1;
+	}
+	printf("Succès de la fonction fopen\n");
+	int done = 0;
+	while(done == 0){
+		done = readline(stream,line);
+		struct fractal* fra = create_fractal(line);
+		sem_wait(&empty);
+		pthread_mutex_lock(&mutex);
+		add_buffer(fra);
+		pthread_mutex_unlock(&mutex);
         sem_post(&full);
-    }
+	}
 }
 
 // Threads de calcul
-// Pour calculer la moyenne de tous les threads pour calculer la valeur de la fractale max
 void consommateur (){
     long calcul;
     while (true){
         sem_wait(&full);
         pthread_mutex_lock(&mutex);
         // Section critique
-        max_thread(empty,full);
+        calculer();
         pthread_mutex_unlock(&mutex);
         sem_post(&empty);
     }
@@ -84,39 +92,50 @@ void reader (){
     }
 }
 
+
 // Lecture d'une ligne sur un fichier
-// Retourne le buffer qui contient une ligne du fichier
+// Retourne 0 si le fichier n'est pas fini, et 1 si le fichier est fini
 // OK !
-char* readline(FILE* stream){
-	char* buf = (char*)malloc(sizeof(char)*84);
-	if(buf == NULL){
-		printf("Erreur readline/malloc\n");
-		return 1;
-	}
+int readline(FILE* stream, char* buf){
+	int i = 0;
 	char temp = fgetc(stream);
-	while(temp != '\n'){
+	while(temp != '\n' && temp != EOF){
 		*(buf+i) = temp;
 		temp = fgetc(stream);
 		i++;
 	}
-	return buf;
+	if(temp == EOF){
+		return 1;
+	}
+	return 0;
 }
 
+
 // Creation d'une fractale sur base d'une ligne
-// Retourne la nouvelle fractale
 // OK !
 struct fractal* create_fractal(*char line){
 	int i = 1;
 	char* delim = " ";
 	char* attr[5];
-	attr[0] = strtok(line,delim); // On split la ligne a chaque espace
+	attr[0] = strtok(line,delim);
 	while(i<5){
 		attr[i] = strtok(NULL,delim);
 		i++;
 	}
-	return fractal_new(attr[0],atoi(attr[1]),atoi(attr[2]),atof(attr[3]),atof(attr[4])); // Creation d'une nouvelle fractale
+	return fractal_new(attr[0],atoi(attr[1]),atoi(attr[2]),atof(attr[3]),atof(attr[4]));
 }
 
+// Ajouter un élément au buffer
+// OK !
+int add_buffer(struct fractal *frac){
+	for(int i=0;i<10;i++){
+		if(buffer[i] == NULL){
+			buffer[i] = frac;
+			return 0;
+		}
+	}
+	return 1;
+}
 
 // On compare 2 fractales pour savoir laquelle a la plus grande valeur, si on applique cette fonction sur l'entierete d'un tableau, on peut trouver le max de toutes les fractales.
 void max_fractale (struct fractal *f1){
@@ -144,3 +163,4 @@ void moyenne (){
     }
     moyenne = somme_values/somme_iter;
 }
+
