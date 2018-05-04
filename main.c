@@ -77,6 +77,7 @@ void consommateur (){
 }
 
 // Lecture
+// A refaire 
 void reader (){
     int fd = open(0,O_RDONLY);
     if (fd == -1){
@@ -118,12 +119,12 @@ struct fractal* create_fractal(*char line){
 	int i = 1;
 	char* delim = " ";
 	char* attr[5];
-	attr[0] = strtok(line,delim);
+	attr[0] = strtok(line,delim); // On split la ligne à chaque espace qu'on rencontre
 	while(i<5){
 		attr[i] = strtok(NULL,delim);
 		i++;
 	}
-	return fractal_new(attr[0],atoi(attr[1]),atoi(attr[2]),atof(attr[3]),atof(attr[4]));
+	return fractal_new(attr[0],atoi(attr[1]),atoi(attr[2]),atof(attr[3]),atof(attr[4])); // Creation d'une nouvelle fractale
 }
 
 // Ajouter un élément au buffer
@@ -138,7 +139,7 @@ int add_buffer(struct fractal *frac){
 	return 1;
 }
 
-// On compare 2 fractales pour savoir laquelle a la plus grande valeur, si on applique cette fonction sur l'entierete d'un tableau, on peut trouver le max de toutes les fractales.
+// On trouve la fractale qui a la valeur moyenne la plus grande
 void max_fractale(struct fractal *frac){
 	moy = calcul_moyenne(frac)
 	if(moy>max){
@@ -164,6 +165,7 @@ void moyenne(){
 }
 */
 
+// On calcule la moyenne des valeurs de la fractale en chaque pixel
 int calcul_moyenne(const struct fractale *frac){
 	unsigned long sum;
 	unsigned int width = fractal_get_width(frac);
