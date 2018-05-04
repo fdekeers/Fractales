@@ -3,7 +3,7 @@
 
 struct fractal *fractal_new(const char *name, int width, int height, double a, double b)
 {
-    struct fractal *fr = (struct fractal*)malloc(sizeof(struct fractal));
+	struct fractal *fr = (struct fractal*)malloc(sizeof(struct fractal));
     if (fr==NULL){
         return NULL;
     }

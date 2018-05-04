@@ -9,6 +9,8 @@
 #define ERROR = 1
 
 // Initialisations
+double max;
+struct fractal *frac_max = NULL;
 struct fractal *buffer[10];
 pthread_mutex_t mutex;
 pthread_mutex_init(&mutex,NULL);
@@ -16,7 +18,6 @@ sem_t empty;
 sem_init(&empty,0,10);
 sem_t full;
 sem_init(&full,0,0);
-
 
 int main(int argc, char *argv[])
 {
@@ -138,20 +139,18 @@ int add_buffer(struct fractal *frac){
 }
 
 // On compare 2 fractales pour savoir laquelle a la plus grande valeur, si on applique cette fonction sur l'entierete d'un tableau, on peut trouver le max de toutes les fractales.
-void max_fractale (struct fractal *f1){
-    int max; // Fractale max
-    int nbr_iter1 = fractal_compute_value(f1,f1->a,f1->b); // Nombre d'iterations de la valeur de recurrence sur la fractale
-    long valeur_f1 = fractal_get_value(f1,f1->a,f1->b)/nbr_iter1;
-    if (valeur_f1 > max){
-        max = valeur_f1;
-    }
-    else
-        max = max;
+void max_fractale(struct fractal *frac){
+	moy = calcul_moyenne(frac)
+	if(moy>max){
+		max = moy;
+		frac_max = frac;
+	}
 }
 
 // Calcule la moyenne des valeurs de toutes les fractales
 // Quels arguments ? Comment trouver le nombre de fractales ?
-void moyenne (){
+/*
+void moyenne(){
     struct fractal *f = (struct fractal)malloc(sizeof(struct fractal)); // Un tableau de fractales, on a egalement acces a int **values qui stocke toutes les valeurs qui concerne la fractale
     double somme_iter;
     double somme_values;
@@ -163,4 +162,16 @@ void moyenne (){
     }
     moyenne = somme_values/somme_iter;
 }
+*/
 
+int calcul_moyenne(const struct fractale *frac){
+	unsigned long sum;
+	unsigned int width = fractal_get_width(frac);
+	unsigned int height = fractal_get_height(frac);
+	for(int i = 0;i<width;i++){
+		for(int j = 0;j<height;j++){
+			sum = sum + fractal_compute_value(frac,i,j);
+		}
+	}
+	return sum/(width*height);
+}
