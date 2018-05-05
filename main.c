@@ -8,6 +8,12 @@
 #include <string.h>
 #define ERROR = 1
 
+#include <CUnit/CUnit.h>
+#include <CUnit/Automated.h>
+#include <CUnit/Basic.h>
+#include <CUnit/Console.h>
+#include <CUnit/CUCurses.h>
+
 // Initialisations
 double max;
 struct fractal *frac_max = NULL;
@@ -177,3 +183,6 @@ int calcul_moyenne(const struct fractale *frac){
 	}
 	return sum/(width*height);
 }
+
+
+

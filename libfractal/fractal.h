@@ -7,6 +7,7 @@ struct fractal {
 	unsigned int height;
 	double a; //partie réelle des coordonnées de la fractale
 	double b; //partie imaginaire des coordonnées de la fractale
+    int ** values;
 };
 
 /*
