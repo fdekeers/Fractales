@@ -70,13 +70,17 @@ int producteur(char* filename){
 }
 
 // Threads de calcul
-void consommateur (){
-    long calcul;
+// Le consommateur va prendre les données du producteur (le buffer)
+int consommateur (){
     while (true){
         sem_wait(&full);
         pthread_mutex_lock(&mutex);
-        // Section critique
-        calculer();
+        for (int i=0; i<maxthreads;i++){
+            if (buffer[i] != 0){
+                max_fractale(buffer[i]);
+                buffer[i]=0;
+            }
+        }
         pthread_mutex_unlock(&mutex);
         sem_post(&empty);
     }
@@ -153,23 +157,6 @@ void max_fractale(struct fractal *frac){
 		frac_max = frac;
 	}
 }
-
-// Calcule la moyenne des valeurs de toutes les fractales
-// Quels arguments ? Comment trouver le nombre de fractales ?
-/*
-void moyenne(){
-    struct fractal *f = (struct fractal)malloc(sizeof(struct fractal)); // Un tableau de fractales, on a egalement acces a int **values qui stocke toutes les valeurs qui concerne la fractale
-    double somme_iter;
-    double somme_values;
-    double moyenne;
-    for (int i=0; ;i++){
-        int nbr_iter = fractal_compute_value(f[i],f[i]->a,f[i]->b);
-        somme_iter += nbr_iter;
-        somme_values += fractal_get_value(f[i],f[i]->a,f[i]->b);
-    }
-    moyenne = somme_values/somme_iter;
-}
-*/
 
 // On calcule la moyenne des valeurs de la fractale en chaque pixel
 int calcul_moyenne(const struct fractale *frac){
