@@ -5,17 +5,53 @@
 #include <fcntl.h>
 #include <string.h>
 
-int main(int argc, char *argv[]) {
-	char *buffer[10] = {NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL};
-	for(int i=0;i<10;i++){
-		if(buffer[i] != NULL){
-			char* temp = buffer[i];
-			buffer[i] = NULL;
-			printf("Elément enlevé : %s\n",temp);
-			printf("Elément à la position %i : %s\n",i+1,buffer[i]);
-			return 0;
+// Lecture d'une ligne sur un fichier
+// Retourne 0 si le fichier n'est pas fini, et 1 si le fichier est fini
+// OK !
+int readline(FILE* stream, char* buf){
+	int i = 0;
+	char temp = fgetc(stream);
+	while(temp == '\n'){
+		temp = fgetc(stream);
+	}
+	while(temp == '#'){
+		while(temp != '\n' && temp != EOF){
+			temp = fgetc(stream);
+			i++;
 		}
 	}
-	printf("Tableau vide\n");
-	return 1;
+	i = 0;
+	while(temp != '\n' && temp != EOF){
+		*(buf+i) = temp;
+		temp = fgetc(stream);
+		i++;
+	}
+	if(temp == EOF){
+		return 1;
+	}
+	return 0;
+}
+
+
+
+
+
+
+int main(int argc, char *argv[]) {
+	char* file = argv[1];
+	char* buf = (char*)malloc(sizeof(char)*100);
+	if(buf == NULL){
+		return 1;
+	}
+	FILE* stream = fopen(file,"r");
+	if(stream == NULL){
+		return 1;
+	}
+	int done = readline(stream,buf);
+	while(done == 0){
+		printf("Ligne lue : %s\n",buf);
+		done = readline(stream,buf);
+	}
+	printf("Ligne lue : %s\n",buf);
+	return 0;
 }

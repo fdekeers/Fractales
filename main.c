@@ -84,6 +84,7 @@ int consommateur (){
     }
 }
 
+/*
 // Lecture
 // A refaire 
 void reader (){
@@ -101,6 +102,7 @@ void reader (){
         rd = read(fd, buffer, sizeof(char));
     }
 }
+*/
 
 
 // Lecture d'une ligne sur un fichier
@@ -109,6 +111,16 @@ void reader (){
 int readline(FILE* stream, char* buf){
 	int i = 0;
 	char temp = fgetc(stream);
+	while(temp == '\n'){
+		temp = fgetc(stream);
+	}
+	while(temp == '#'){
+		while(temp != '\n' && temp != EOF){
+			temp = fgetc(stream);
+			i++;
+		}
+	}
+	i = 0;
 	while(temp != '\n' && temp != EOF){
 		*(buf+i) = temp;
 		temp = fgetc(stream);
@@ -119,7 +131,6 @@ int readline(FILE* stream, char* buf){
 	}
 	return 0;
 }
-
 
 // Creation d'une fractale sur base d'une ligne
 // OK !
