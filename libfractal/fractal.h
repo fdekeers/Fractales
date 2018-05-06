@@ -1,3 +1,7 @@
+// @Titre : Projet Fractales
+// @Auteurs : Francois DEKEERSMAECKER ( 1600) & Margaux GERARD (7659 1600)
+// @Date : 11 mai 2018
+
 #ifndef _FRACTAL_H
 #define _FRACTAL_H
 
@@ -119,16 +123,17 @@ int write_bitmap_sdl(const struct fractal *f, const char *fname);
 // Structure pour les noeuds de la pile
 typedef struct noeud {
     struct node *next;
-    int value;
+    struct fractal fract;
+    int value; // Necessaire ?
 } node;
 
 // Fonctions a implementer pour la pile
 
-// Creation d'un nouveau noeud avec comme valeur value.
-int push(struct noeud **head, const char *val);
+// Creation d'un nouveau noeud avec a l'interieur la fractale fract. On ajoute ce noeud a la tete de la pile
+int push(struct noeud **head, struct fractal *fract);
 
-// On ajoute un noeud dans la liste
-int pop(struct noeud **head, char *result);
+// On retire le noeud qui est a la tete de la pile
+int pop(struct noeud **head, struct fractal *fract);
 
 
 #endif

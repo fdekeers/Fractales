@@ -1,3 +1,7 @@
+// @Titre : Projet Fractales
+// @Auteurs : Francois DEKEERSMAECKER ( 1600) & Margaux GERARD (7659 1600)
+// @Date : 11 mai 2018
+
 #include <stdlib.h>
 #include "fractal.h"
 
@@ -64,9 +68,10 @@ typedef struct noeud {
 } node;
 
 // Implementation des fonctions pour la pile
-// Creation d'un nouveau noeud avec comme valeur value.
+
+// On ajoute un nouveau noeud a la tete de la pile
 // Repris d'Inginious
-int fract_push(struct noeud **head, const char *val){
+int fract_push(struct noeud **head, struct fractal *fract){
     if (head==NULL) {
         return 1;
     }
@@ -81,15 +86,15 @@ int fract_push(struct noeud **head, const char *val){
     if ((newnode->name)==NULL) {
         return 1;
     }
-    strcpy(newnode->name,value);
+    strcpy(newnode->name,fract->name);
     newnode->next =(*head);
     *head = newnode;
     return 0;
 }
 
-// On ajoute un noeud dans la liste
+// On retire le noeud present a la tete de la pile
 // Repris d'Inginious
-int fract_pop(struct noeud **head, char *result){
+int fract_pop(struct noeud **head, struct fractal *fract){
     if (head==NULL) {
         return 1;
     }
@@ -102,7 +107,7 @@ int fract_pop(struct noeud **head, char *result){
         free(newnode);
         return 0;
     }
-    strcpy(result,newnode->name);
+    strcpy(fract->name,newnode->name);
     (*head)=newnode->next;
     free(newnode->name);
     free(newnode);
