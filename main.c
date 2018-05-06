@@ -72,15 +72,11 @@ int producteur(char* filename){
 // Threads de calcul
 // Le consommateur va prendre les données du producteur (le buffer)
 int consommateur (){
+	struct fractal* frac = (struct fractal*)malloc(sizeof(struct fractal));
     while (true){
         sem_wait(&full);
         pthread_mutex_lock(&mutex);
-        for (int i=0; i<maxthreads;i++){
-            if (buffer[i] != 0){
-                max_fractale(buffer[i]);
-                buffer[i]=0;
-            }
-        }
+		frac = 
         pthread_mutex_unlock(&mutex);
         sem_post(&empty);
     }
@@ -149,6 +145,16 @@ int add_buffer(struct fractal *frac){
 	return 1;
 }
 
+// Retirer un élément du buffer
+// OK !
+struct fractal* remove_buffer(){
+	for(int i=0;i<10;i++){
+		if(buffer[i] != NULL){
+			return buffer[i];
+		}
+	}
+}
+
 // On trouve la fractale qui a la valeur moyenne la plus grande
 void max_fractale(struct fractal *frac){
 	moy = calcul_moyenne(frac)
@@ -160,7 +166,7 @@ void max_fractale(struct fractal *frac){
 }
 
 // On calcule la moyenne des valeurs de la fractale en chaque pixel
-int calcul_moyenne(const struct fractale *frac){
+int calcul_moyenne(struct fractale *frac){
 	unsigned long sum;
 	unsigned int width = fractal_get_width(frac);
 	unsigned int height = fractal_get_height(frac);

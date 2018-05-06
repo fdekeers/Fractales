@@ -6,17 +6,13 @@
 #include <string.h>
 
 int main(int argc, char *argv[]) {
-	int i = 1;
-	char* line = argv[1];
-	printf("Argument : %s\n",line);
-	char* delim = " ";
-	char* attr[5];
-	attr[0] = strtok(line,delim);
-	printf("Premier attribut : %s\n",attr[0]);
-	while(i<5){
-		attr[i] = strtok(NULL,delim);
-		printf("Attribut %i : %s\n",i+1,attr[i]);
-		i++;
+	char *buffer[10] = {NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL};
+	for(int i=0;i<10;i++){
+		if(buffer[i] != NULL){
+			printf("L'élément lu est : %s\n",buffer[i]);
+			return 0;
+		}
 	}
-	return 0;
+	printf("Tableau vide\n");
+	return 1;
 }
