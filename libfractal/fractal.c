@@ -1,3 +1,7 @@
+// @Titre : Projet Fractales
+// @Auteurs : Francois DEKEERSMAECKER ( 1600) & Margaux GERARD (7659 1600)
+// @Date : 11 mai 2018
+
 #include <stdlib.h>
 #include "fractal.h"
 
