@@ -27,18 +27,25 @@ sem_init(&full,0,0);
 
 int main(int argc, char *argv[])
 {
+	int nfichiers = argc-2;
 	char* destination = argv[argc-1];
 	int d = 0;
 	int maxthreads;
+	// Prise en compte des arguments de la main
 	for(int i = 1;i<argc;i++){
 		if(argv[i] == "-d"){
 			d = 1;
+			nfichiers--;
 		}
 		if(argv[i] == "--maxthreads"){
 			maxthreads = atoi(argv[i+1]);
+			nfichiers = nfichiers-2;
 		}
 	}
-	pthread_t thread;
+	char* fichiers[nfichiers]
+	
+	pthread_t threads[nfichiers];
+	
     int retour_thread = pthread_create(&thread,NULL,void *(*start_routine) (void *), void *arg);
     if (retour_thread != 0){
         printf("Erreur lors de la création du thread\n");
