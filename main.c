@@ -1,5 +1,5 @@
 // @Titre : Projet Fractales
-// @Auteurs : Francois DEKEERSMAECKER ( 1600) & Margaux GERARD (7659 1600)
+// @Auteurs : Francois DE KEERSMAEKER (7367 1600) & Margaux GERARD (7659 1600)
 // @Date : 11 mai 2018
 
 #include <stdio.h>
