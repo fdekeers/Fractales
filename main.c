@@ -53,7 +53,7 @@ int producteur(char* filename){
 		return 1;
 	}
 	char* line = (char*)malloc(sizeof(char)*100);
-	if(buf == NULL){
+	if(line == NULL){
 		return 1;
 	}
 	printf("Succès de la fonction fopen\n");
@@ -74,35 +74,19 @@ int producteur(char* filename){
 int consommateur (){
 	int err;
 	struct fractal* frac = (struct fractal*)malloc(sizeof(struct fractal));
+    if (frac == NULL){
+        return 1;
+    }
     while (true){
         sem_wait(&full);
         pthread_mutex_lock(&mutex);
 		frac = remove_buffer();
+        max_fractale(frac);
         pthread_mutex_unlock(&mutex);
         sem_post(&empty);
 		max_fractale(frac);
     }
 }
-
-/*
-// Lecture
-// A refaire 
-void reader (){
-    int fd = open(0,O_RDONLY);
-    if (fd == -1){
-        return -1;
-    }
-    char * buff;
-    int rd = read(fd, buf, sizeof(char));
-    for (int i = 0; rd != -1 && buffer[i] != '\n'; i++) {
-        if (buffer[0]=='#' || buffer==NULL){
-            break;
-        }
-        readline();
-        rd = read(fd, buffer, sizeof(char));
-    }
-}
-*/
 
 
 // Lecture d'une ligne sur un fichier
@@ -175,9 +159,9 @@ struct fractal* remove_buffer(){
 void max_fractale(struct fractal *frac){
 	moy = calcul_moyenne(frac)
 	if(moy>=max){
-		max = moy;
+        max = moy;
 		frac_max = frac;
-        fract_push(*frac_max, max); // QUID ?
+        fract_push(*frac_max, max);
 	}
 }
 
@@ -188,8 +172,24 @@ int calcul_moyenne(struct fractale *frac){
 	unsigned int height = fractal_get_height(frac);
 	for(int i = 0;i<width;i++){
 		for(int j = 0;j<height;j++){
-			sum = sum + fractal_compute_value(frac,i,j);
+			sum += fractal_compute_value(frac,i,j);
 		}
 	}
 	return sum/(width*height);
+}
+
+// Fonction qui va afficher toutes les fractales qui sont présentes dans la pile
+void frac_affiche(struct noeud * head){
+    if (head == NULL){
+        return NULL;
+    }
+    int i=0;
+    char *fname;
+    struct noeud * runner = head;
+    while (runner != NULL){
+        fname = "BMP_out_i";
+        write_bitmap_sdl(runner->fract, fname);
+        i++;
+        runner = runner->next;
+    }
 }
