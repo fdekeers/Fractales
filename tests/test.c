@@ -9,7 +9,10 @@ int main(int argc, char *argv[]) {
 	char *buffer[10] = {NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL};
 	for(int i=0;i<10;i++){
 		if(buffer[i] != NULL){
-			printf("L'élément lu est : %s\n",buffer[i]);
+			char* temp = buffer[i];
+			buffer[i] = NULL;
+			printf("Elément enlevé : %s\n",temp);
+			printf("Elément à la position %i : %s\n",i+1,buffer[i]);
 			return 0;
 		}
 	}
