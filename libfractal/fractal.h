@@ -1,6 +1,7 @@
 #ifndef _FRACTAL_H
 #define _FRACTAL_H
 
+// Structure pour les fractales
 struct fractal {
     char *name;
 	unsigned int width;
@@ -10,6 +11,7 @@ struct fractal {
     int ** values;
 };
 
+// Fonctions a implementer pour les fracatles
 /*
  * fractal_new: alloue une nouvelle structure fractal
  *
@@ -113,5 +115,20 @@ int fractal_compute_value(struct fractal *f, int x, int y);
  * @return: 0 si pas d'erreurs, -1 sinon
  */
 int write_bitmap_sdl(const struct fractal *f, const char *fname);
+
+// Structure pour les noeuds de la pile
+typedef struct noeud {
+    struct node *next;
+    int value;
+} node;
+
+// Fonctions a implementer pour la pile
+
+// Creation d'un nouveau noeud avec comme valeur value.
+int push(struct noeud **head, const char *val);
+
+// On ajoute un noeud dans la liste
+int pop(struct noeud **head, char *result);
+
 
 #endif

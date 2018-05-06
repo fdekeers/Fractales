@@ -152,9 +152,10 @@ int add_buffer(struct fractal *frac){
 // On trouve la fractale qui a la valeur moyenne la plus grande
 void max_fractale(struct fractal *frac){
 	moy = calcul_moyenne(frac)
-	if(moy>max){
+	if(moy>=max){
 		max = moy;
 		frac_max = frac;
+        fract_push(*frac_max, max);
 	}
 }
 
