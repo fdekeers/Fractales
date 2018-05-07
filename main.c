@@ -95,14 +95,17 @@ int consommateur (){
 
 
 // Lecture d'une ligne sur un fichier
+// Passe les lignes vides ou commençant par '#'
 // Retourne 0 si le fichier n'est pas fini, et 1 si le fichier est fini
 // OK !
 int readline(FILE* stream, char* buf){
 	int i = 0;
 	char temp = fgetc(stream);
+	// Ligne vide
 	while(temp == '\n'){
 		temp = fgetc(stream);
 	}
+	// Ligne commençant par '#'
 	while(temp == '#'){
 		while(temp != '\n' && temp != EOF){
 			temp = fgetc(stream);
@@ -116,9 +119,9 @@ int readline(FILE* stream, char* buf){
 		i++;
 	}
 	if(temp == EOF){
-		return 1; // Erreur
+		return 1; // Le fichier est terminé
 	}
-	return 0; // La fonction s'est executee correctement
+	return 0; // Le fichier n'est pas terminé
 }
 
 // Creation d'une fractale sur base d'une ligne
@@ -184,16 +187,14 @@ int calcul_moyenne(struct fractale *frac){
 }
 
 // Fonction qui va afficher toutes les fractales qui sont présentes dans la pile
-void frac_affiche(struct noeud * head){
+void frac_affiche(struct noeud * head, char* destination){
     if (head == NULL){ // On teste si la pile est nulle
         return NULL;
     }
     int i=0;
-    char *fname;
     struct noeud * runner = head; // Pointeur qui va parcourir la pile
     while (runner != NULL){
-        fname = "BMP_out_i"; // Nom du fichier BMP de sortie
-        write_bitmap_sdl(runner->fract, fname); // Application de la fonction donnee dans l'enonce qui permet d'afficher la fractale sur un certain fichier de sortie
+        write_bitmap_sdl(runner->fract, destination); // Application de la fonction donnee dans l'enonce qui permet d'afficher la fractale sur un certain fichier de sortie
         i++;
         runner = runner->next;
     }
