@@ -28,7 +28,7 @@ int main(int argc, char *argv[])
 	int nfichiers = argc-2;
 	char* destination = argv[argc-1];
 	int d = 0;
-	int maxthreads;
+	int maxthreads = 5;
 	
 	// Prise en compte des arguments de la main
 	for(int i = 1;i<argc;i++){
@@ -60,20 +60,45 @@ int main(int argc, char *argv[])
 		}
 	}
 	
-	pthread_t threads[nfichiers];
+	// Threads de lecture
+	pthread_t threads_lecture[nfichiers];
 	int err;
 	for(int i = 0;i<nfichiers;i++){
-		err = pthread_create(&(threads[i]),NULL,&producteur,(void*)fichiers[i]);
+		err = pthread_create(&(threads_lecture[i]),NULL,&producteur,(void*)fichiers[i]);
 		if(err != 0){
+			printf("Erreur lors de la création des threads de lecture\n");
 			return 1;
 		}
 	}
-		
 	
-    int retour_thread = pthread_create(&thread,NULL,void *(*start_routine) (void *), void *arg);
-    if (retour_thread != 0){
-        printf("Erreur lors de la création du thread\n");
-    }
+	for(int i=0;i<nfichiers;i++){
+		int *r;
+		err = pthread_join(threads_lecture[i],(void**)&r);
+		if(err != 0){
+			printf("Erreur dans la fonction pthread_join\n");
+			return 1;
+		}
+	}
+	
+	// Threads de calcul
+	pthread_t threads_calcul[maxthreads];
+	int err;
+	for(int i = 0;i<maxthreads;i++){
+		err = pthread_create(&(threads_calcul[i]),NULL,&consommateur,NULL);
+		if(err != 0){
+			printf("Erreur lors de la création des threads de calcul\n");
+			return 1;
+		}
+	}
+	
+	for(int i = 0;i<maxthreads;i++){
+		err = pthread_join(threads_calcul[i],(void**)&r);
+		free(r);
+		if(err != 0){
+			printf("Erreur dans la fonction pthread_join\n");
+			return 1;
+		}
+	}
 	return 0;
 }
 
