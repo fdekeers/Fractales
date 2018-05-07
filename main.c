@@ -61,6 +61,14 @@ int main(int argc, char *argv[])
 	}
 	
 	pthread_t threads[nfichiers];
+	int err;
+	for(int i = 0;i<nfichiers;i++){
+		err = pthread_create(&(threads[i]),NULL,&producteur,(void*)fichiers[i]);
+		if(err != 0){
+			return 1;
+		}
+	}
+		
 	
     int retour_thread = pthread_create(&thread,NULL,void *(*start_routine) (void *), void *arg);
     if (retour_thread != 0){
