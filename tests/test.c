@@ -5,53 +5,56 @@
 #include <fcntl.h>
 #include <string.h>
 
-// Lecture d'une ligne sur un fichier
-// Retourne 0 si le fichier n'est pas fini, et 1 si le fichier est fini
-// OK !
-int readline(FILE* stream, char* buf){
-	int i = 0;
-	char temp = fgetc(stream);
-	while(temp == '\n'){
-		temp = fgetc(stream);
+int main(int argc, char *argv[]) {
+	printf("argc = %i\n",argc);
+	int nfichiers = argc-2;
+	int d = 0;
+	int maxthreads;
+	char* buffer = (char*)malloc(sizeof(char)*20);
+	if(buffer == NULL){
+		return 1;
 	}
-	while(temp == '#'){
-		while(temp != '\n' && temp != EOF){
-			temp = fgetc(stream);
-			i++;
+	
+	
+	for(int a = 1;a<argc-1;a++){
+		printf("Argument %i : %s\n",a,argv[a]);
+	}
+	
+	// Prise en compte des arguments de la main
+	for(int i = 1;i<argc;i++){
+		if(strcmp(argv[i],"-d") == 0){
+			d = 1;
+			nfichiers = nfichiers-1;
+			printf("Décrémentation du nombre de fichiers d'entrée\n");
+		}
+		if(strcmp(argv[i],"--maxthreads") == 0){
+			maxthreads = atoi(argv[i+1]);
+			nfichiers = nfichiers-2;
 		}
 	}
-	i = 0;
-	while(temp != '\n' && temp != EOF){
-		*(buf+i) = temp;
-		temp = fgetc(stream);
-		i++;
+	printf("Nombre de fichiers de sortie : %i\n",nfichiers);
+	
+	
+	
+	// Création du tableau de fichiers d'entrée
+	char* fichiers[nfichiers];
+	int i = 1;
+	int j = 0;
+	while(i<argc-1 && j<nfichiers){
+		if(strcmp(argv[i],"-d") == 0){
+			i++;
+		}
+		else if(strcmp(argv[i],"--maxthreads") == 0){
+			i = i+2;
+		}
+		else{
+			fichiers[j] = argv[i];
+			i++;
+			j++;
+		}
 	}
-	if(temp == EOF){
-		return 1;
+	
+	for(int k = 0;k<nfichiers;k++){
+		printf("Fichier %i : %s\n",k+1,fichiers[k]);
 	}
-	return 0;
-}
-
-
-
-
-
-
-int main(int argc, char *argv[]) {
-	char* file = argv[1];
-	char* buf = (char*)malloc(sizeof(char)*100);
-	if(buf == NULL){
-		return 1;
-	}
-	FILE* stream = fopen(file,"r");
-	if(stream == NULL){
-		return 1;
-	}
-	int done = readline(stream,buf);
-	while(done == 0){
-		printf("Ligne lue : %s\n",buf);
-		done = readline(stream,buf);
-	}
-	printf("Ligne lue : %s\n",buf);
-	return 0;
 }

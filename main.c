@@ -29,18 +29,36 @@ int main(int argc, char *argv[])
 	char* destination = argv[argc-1];
 	int d = 0;
 	int maxthreads;
+	
 	// Prise en compte des arguments de la main
 	for(int i = 1;i<argc;i++){
-		if(argv[i] == "-d"){
+		if(strcmp(argv[i],"-d") == 0){
 			d = 1;
-			nfichiers--;
+			nfichiers = nfichiers-1;
 		}
-		if(argv[i] == "--maxthreads"){
+		if(strcmp(argv[i],"--maxthreads") == 0){
 			maxthreads = atoi(argv[i+1]);
 			nfichiers = nfichiers-2;
 		}
 	}
-	char* fichiers[nfichiers]
+	
+	// Création du tableau de fichiers d'entrée
+	char* fichiers[nfichiers];
+	int i = 1;
+	int j = 0;
+	while(i<argc-1 && j<nfichiers){
+		if(strcmp(argv[i],"-d") == 0){
+			i++;
+		}
+		else if(strcmp(argv[i],"--maxthreads") == 0){
+			i = i+2;
+		}
+		else{
+			fichiers[j] = argv[i];
+			i++;
+			j++;
+		}
+	}
 	
 	pthread_t threads[nfichiers];
 	
