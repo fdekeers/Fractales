@@ -24,7 +24,7 @@
 #define AMASK 0xff000000
 #endif
 
-int write_bitmap_sdl(const struct fractal *f, const char *fname)
+int write_bitmap_sdl(struct fractal *f, const char *fname)
 {
     SDL_Surface *back;
     SDL_Rect pix;

@@ -17,6 +17,10 @@ struct fractal *fractal_new(const char *name, int width, int height, double a, d
     fr->height = height;
     fr->a = a;
     fr->b = b;
+	fr->values = (double**)calloc(width,sizeof(double*));
+	for(int i=0;i<width;i++){
+		fr->values[i] = (double*)calloc(height,sizeof(double));
+	}
     return fr;
 }
 
@@ -26,50 +30,52 @@ void fractal_free(struct fractal *f)
     free(f);
 }
 
-const char *fractal_get_name(const struct fractal *f)
+const char *fractal_get_name(struct fractal *f)
 {
     return f->name;
 }
 
-int fractal_get_value(const struct fractal *f, int x, int y)
+int fractal_get_value(struct fractal *f, int x, int y)
 {
-    return fractal_compute_value(f,x,y);
+    return f->values[y][x];
 }
+
 
 void fractal_set_value(struct fractal *f, int x, int y, int val)
 {
-    f->values[x][y]=val;
+    f->values[y][x]=val;
 }
 
-int fractal_get_width(const struct fractal *f)
+
+int fractal_get_width(struct fractal *f)
 {
     return f->width;
 }
 
-int fractal_get_height(const struct fractal *f)
+int fractal_get_height(struct fractal *f)
 {
     return f->height;
 }
 
-double fractal_get_a(const struct fractal *f)
+double fractal_get_a(struct fractal *f)
 {
     return f->a;
 }
 
-double fractal_get_b(const struct fractal *f)
+double fractal_get_b(struct fractal *f)
 {
     return f->b;
 }
 
-struct noeud* createNoeud(fractal * f){
-    struct noeud* n = malloc(sizeof(noeud));
-    n->fractal = f;
+struct noeud* createNoeud(struct fractal * f){
+    struct noeud* n = malloc(sizeof(struct noeud));
+    n->fract = f;
     n->next = NULL;
     return n;
 }
 
-void freeNoeud(noeud *n){
-    free(n->fractal);
+void freeNoeud(struct noeud *n){
+    free(n->fract);
     free(n);
 }
 
@@ -87,7 +93,7 @@ int push(struct noeud **head, struct noeud *n){
     if (n==NULL) {
         return 1;
     }
-    if (n->fractal == NULL){
+    if (n->fract == NULL){
         return 1;
     }
     n->next = *head;
@@ -97,7 +103,7 @@ int push(struct noeud **head, struct noeud *n){
 
 // On retire le noeud present a la tete de la pile
 // Repris d'Inginious
-int pop(struct noeud **head, struct fractal *fract){
+int pop(struct noeud **head){
     if (head==NULL) {
         return 1;
     }
