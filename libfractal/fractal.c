@@ -61,34 +61,39 @@ double fractal_get_b(const struct fractal *f)
     return f->b;
 }
 
-// Structure pour un noeud de la pile
-typedef struct noeud {
-    struct node *next;
-    int value;
-} node;
+*noeud createNoeud(fractal * f){
+    *noeud n = malloc(sizeof(noeud));
+    n->fractal = f;
+    n->node = NULL;
+    return n;
+}
+
+void freeNoeud(noeud *n){
+    free(n);
+}
 
 // Implementation des fonctions pour la pile
 
 // On ajoute un nouveau noeud a la tete de la pile
 // Repris d'Inginious
-int fract_push(struct noeud **head, struct fractal *fract){
+int fract_push(struct noeud **head, struct noeud *n){
     if (head==NULL) {
         return 1;
     }
     if (*head==NULL) {
         return 1;
     }
-    struct node *newnode = (struct node *) malloc (sizeof (struct node));
     if (newnode==NULL) {
         return 1;
     }
-    newnode->name = (char *)malloc((strlen(value)+1)*(sizeof (char)));
-    if ((newnode->name)==NULL) {
+    if (n==NULL) {
         return 1;
     }
-    strcpy(newnode->name,fract->name);
-    newnode->next =(*head);
-    *head = newnode;
+    if (n->fractal == NULL){
+        return 1;
+    }
+    n->next = *head;
+    *head = n;
     return 0;
 }
 

@@ -123,17 +123,20 @@ int write_bitmap_sdl(const struct fractal *f, const char *fname);
 // Structure pour les noeuds de la pile
 typedef struct noeud {
     struct node *next;
-    struct fractal fract;
-    int value; // Necessaire ?
+    struct fractal *fract;
 } node;
 
 // Fonctions a implementer pour la pile
 
 // Creation d'un nouveau noeud avec a l'interieur la fractale fract. On ajoute ce noeud a la tete de la pile
-int push(struct noeud **head, struct fractal *fract);
+int fract_push(struct noeud **head, struct fractal *fract);
 
 // On retire le noeud qui est a la tete de la pile
-int pop(struct noeud **head, struct fractal *fract);
+int fract_pop(struct noeud **head, struct fractal *fract);
+
+*noeud createNoeud(fractal * f);
+
+void freeNoeud(noeud *n);
 
 
 #endif

@@ -22,6 +22,7 @@ sem_t empty;
 sem_init(&empty,0,10);
 sem_t full;
 sem_init(&full,0,0);
+noeud **head = NULL;
 
 int main(int argc, char *argv[])
 {
@@ -220,7 +221,13 @@ void max_fractale(struct fractal *frac){
 	if(moy>=max){ // Si la moyenne de frac est plus grande que la valeur max
         max = moy;
 		frac_max = frac; // On stocke la fractale donc la valeur de la moyenne est maximale
-        fract_push(*frac_max, max); // On ajoute cette fractale a la pile pour qu'elle soit affichee par la suite
+        noeud * n = createNoeud(*frac_max);
+        if (*head == NULL){
+            **head = &(createNoeud(frac_max));
+        }
+        else {
+            fract_push(**head,n); // On ajoute cette fractale a la pile pour qu'elle soit affichee par la suite
+        }
 	}
 }
 
@@ -238,15 +245,13 @@ int calcul_moyenne(struct fractale *frac){
 }
 
 // Fonction qui va afficher toutes les fractales qui sont présentes dans la pile
-void frac_affiche(struct noeud * head, char* destination){
+void frac_affiche(struct noeud ** head, char* destination){
     if (head == NULL){ // On teste si la pile est nulle
-        return NULL;
+        return; // On ne peut rien retourner car c'est une fonction void
     }
-    int i=0;
-    struct noeud * runner = head; // Pointeur qui va parcourir la pile
-    while (runner != NULL){
+    struct noeud * runner = *head; // Pointeur qui va parcourir la pile
+    while (runner != NULL){ // Si la pile contient un ou plusieurs éléments
         write_bitmap_sdl(runner->fract, destination); // Application de la fonction donnee dans l'enonce qui permet d'afficher la fractale sur un certain fichier de sortie
-        i++;
         runner = runner->next;
     }
 }
