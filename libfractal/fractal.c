@@ -1,11 +1,11 @@
 // @Titre : Projet Fractales
-// @Auteurs : Francois DEKEERSMAECKER ( 1600) & Margaux GERARD (7659 1600)
+// @Auteurs : Francois DEKEERSMAECKER (7367 1600) & Margaux GERARD (7659 1600)
 // @Date : 11 mai 2018
 
 #include <stdlib.h>
 #include "fractal.h"
 
-// Structure pour les fractales
+// Implementation pour les fractales
 struct fractal *fractal_new(const char *name, int width, int height, double a, double b)
 {
 	struct fractal *fr = (struct fractal*)malloc(sizeof(struct fractal));
@@ -69,6 +69,7 @@ double fractal_get_b(const struct fractal *f)
 }
 
 void freeNoeud(noeud *n){
+    free(n->fractal);
     free(n);
 }
 
@@ -76,7 +77,7 @@ void freeNoeud(noeud *n){
 
 // On ajoute un nouveau noeud a la tete de la pile
 // Repris d'Inginious
-int fract_push(struct noeud **head, struct noeud *n){
+int push(struct noeud **head, struct noeud *n){
     if (head==NULL) {
         return 1;
     }
@@ -99,23 +100,20 @@ int fract_push(struct noeud **head, struct noeud *n){
 
 // On retire le noeud present a la tete de la pile
 // Repris d'Inginious
-int fract_pop(struct noeud **head, struct fractal *fract){
+int pop(struct noeud **head, struct fractal *fract){
     if (head==NULL) {
         return 1;
     }
     if (*head==NULL) {
         return 1;
     }
-    struct node * newnode = (*head);
-    if (newnode->next == NULL){
-        free(newnode->name);
-        free(newnode);
+    struct noeud * n = (*head);
+    if (n->next == NULL){
+        freeNoeud(n);
         return 0;
     }
-    strcpy(fract->name,newnode->name);
-    (*head)=newnode->next;
-    free(newnode->name);
-    free(newnode);
+    (*head)=n->next;
+    freeNoeud(n);
     return 0;
 }
 

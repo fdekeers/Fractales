@@ -129,10 +129,10 @@ typedef struct noeud {
 // Fonctions a implementer pour la pile
 
 // Creation d'un nouveau noeud avec a l'interieur la fractale fract. On ajoute ce noeud a la tete de la pile
-int fract_push(struct noeud **head, struct fractal *fract);
+int push(struct noeud **head, struct fractal *fract);
 
 // On retire le noeud qui est a la tete de la pile
-int fract_pop(struct noeud **head, struct fractal *fract);
+int pop(struct noeud **head, struct fractal *fract);
 
 *noeud createNoeud(fractal * f);
 
