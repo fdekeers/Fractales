@@ -202,7 +202,7 @@ int consommateur (){
 /*
  * readline : Fonction qui lit une ligne sur un fichier d'entrée. Elle passe les lignes vides ou commençant par '#'. OK
  *
- * @stream : ???????
+ * @stream : fichier d'entrée
  * @buf : buffer qui a ete rempli par le producteur
  * @return: 0 si le fichier n'est pas fini, 1 si il est fini
  */
@@ -243,10 +243,10 @@ int readline(FILE* stream, char* buf){
 }
 
 /*
- * create_fractal : Fonction qui cree une fractale sur base d'une ligne. OK
+ * create_fractal : Fonction qui cree une fractale sur base d'une ligne.
  *
  * @line : ligne du fichier avec laquelle on va créer une fractale
- * @return: la fractale qui a etet creee
+ * @return: pointeur vers la fractale qui a ete creee
  */
 
 struct fractal* create_fractal(*char line){
@@ -265,7 +265,7 @@ struct fractal* create_fractal(*char line){
 }
 
 /*
- * add_buffer : Fonction qui ajoute une fractale dans le buffer. OK
+ * add_buffer : Fonction qui ajoute une fractale dans le buffer.
  *
  * @frac : représente la fractale à ajouter au buffer
  * @return: 0 si la fractale a ete ajoutee au buffer correctement, 1 sinon
@@ -284,7 +284,7 @@ int add_buffer(struct fractal *frac){
 }
 
 /*
- * remove_buffer : Fonction qui retire une fractale buffer et remet la case a NULL. OK
+ * remove_buffer : Fonction qui retire une fractale buffer et remet la case a NULL.
  *
  * @return: la fractale qui a ete retiree du buffer
  */

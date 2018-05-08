@@ -1,5 +1,5 @@
 // @Titre : Projet Fractales
-// @Auteurs : Francois DEKEERSMAECKER (7367 1600) & Margaux GERARD (7659 1600)
+// @Auteurs : Francois DE KEERSMAEKER (7367 1600) & Margaux GERARD (7659 1600)
 // @Date : 11 mai 2018
 
 #include <stdlib.h>
@@ -61,10 +61,10 @@ double fractal_get_b(const struct fractal *f)
     return f->b;
 }
 
-*noeud createNoeud(fractal * f){
-    *noeud n = malloc(sizeof(noeud));
+struct noeud* createNoeud(fractal * f){
+    struct noeud* n = malloc(sizeof(noeud));
     n->fractal = f;
-    n->node = NULL;
+    n->next = NULL;
     return n;
 }
 
@@ -82,9 +82,6 @@ int push(struct noeud **head, struct noeud *n){
         return 1;
     }
     if (*head==NULL) {
-        return 1;
-    }
-    if (newnode==NULL) {
         return 1;
     }
     if (n==NULL) {
