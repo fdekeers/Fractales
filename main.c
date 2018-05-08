@@ -12,8 +12,6 @@
 #include <string.h>
 
 // Initialisations
-int error = 1;
-int succes = 0;
 double max;
 struct fractal *frac_max = NULL;
 struct fractal *buffer[10];
@@ -189,18 +187,22 @@ void max_fractale(struct fractal *frac){
  */
 
 void* producteur(char* filename){
+	int* error = (int*)malloc(sizeof(int));
+	int* success = (int*)malloc(sizeof(int));
+	*error = 1;
+	*success = 0;
     FILE *stream = fopen(filename,"r");
     
     // On teste si la fonction fopen a echoue
 	if(stream == NULL){
-		return &ERROR;
+		return error;
 	}
     
 	char* line = (char*)malloc(sizeof(char)*100);
     
     // On teste si le malloc renvoie une erreur ou ne s'est pas execute correctement
 	if(line == NULL){
-		return &ERROR;
+		return error;
 	}
     
 	printf("Succès de la fonction fopen\n");
@@ -218,7 +220,7 @@ void* producteur(char* filename){
 		pthread_mutex_unlock(&mutex); // On debloque le mutex
         sem_post(&full);
 	}
-    return &SUCCES;
+    return success;
 }
 
 /*
@@ -228,12 +230,16 @@ void* producteur(char* filename){
  * @return: 0 si la fonction a execute le code avec succes, 1 sinon
  */
 
-int consommateur (){
+void* consommateur (){
+	int* error = (int*)malloc(sizeof(int));
+	int* success = (int*)malloc(sizeof(int));
+	*error = 1;
+	*success = 0;
 	struct fractal* frac = (struct fractal*)malloc(sizeof(struct fractal));
     
     // On teste si le malloc renvoie une erreur ou ne s'est pas execute correctement
     if (frac == NULL){
-        return 1;
+        return error;
     }
     
     while (1==1){
@@ -247,7 +253,7 @@ int consommateur (){
         sem_post(&empty);
 		max_fractale(frac);
     }
-    return 0;
+    return success;
 }
 
 
@@ -361,7 +367,7 @@ int main(int argc, char *argv[]){
     
 	for(int i = 0;i<maxthreads;i++){
         
-		err = pthread_create(&(threads_calcul[i]),NULL,&((void*)consommateur),NULL);
+		err = pthread_create(&(threads_calcul[i]),NULL,&(consommateur),NULL);
         
 		if(err != 0){
 			printf("Erreur lors de la création des threads de calcul\n");
