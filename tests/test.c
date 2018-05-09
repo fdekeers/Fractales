@@ -135,5 +135,21 @@ void* func(){
 	
 
 int main(int argc, char *argv[]) {
-	struct noeud* head = createNoeu
+	struct noeud** head = (struct noeud**)malloc(sizeof(struct noeud*));
+	char* line = argv[1];
+	struct fractal* frac = create_fractal(line);
+	printf("Nom de la fractale : %s\n",fractal_get_name(frac));
+	printf("Largeur : %i\n",fractal_get_width(frac));
+	printf("Hauteur : %i\n",fractal_get_height(frac));
+	printf("a = %f\n",fractal_get_a(frac));
+	printf("b = %f\n",fractal_get_b(frac));
+	struct noeud* noeud = createNoeud(frac);
+	*head = noeud;
+	printf("Fractale dans le noeud : %s\n",fractal_get_name(noeud->fract));
+	printf("Fractale dans le noeud : %s\n",fractal_get_name((*head)->fract));
+	line = argv[2];
+	frac = create_fractal(line);
+	int err = push(head,createNoeud(frac));
+	printf("Fractale dans le noeud 2 : %s\n",fractal_get_name((*head)->fract));
+	return 0;
 }
