@@ -8,11 +8,8 @@
 #include <string.h>
 #include <SDL.h>
 
-pthread_mutex_t mutex;
-sem_t empty;
-sem_t full;
-int global = 0;
 
+struct fractal *buffer[10] = {NULL};
 
 int readline(FILE* stream, char* buf){
     
@@ -76,7 +73,7 @@ struct fractal* create_fractal(char* line){
 	return fractal_new(attr[0],atoi(attr[1]),atoi(attr[2]),atof(attr[3]),atof(attr[4])); // Creation d'une nouvelle fractale
 }
 
-/*
+
 int add_buffer(struct fractal* frac){
     
 	for(int i = 0; i < 10; i++){
@@ -104,36 +101,30 @@ struct fractal* remove_buffer(){
 	}
 	return NULL;
 }
-*/
-
-double calcul_moyenne(struct fractal *frac){
-    
-	double r;
-	unsigned int width = fractal_get_width(frac); // Variable qui contient la largeur de la fractale
-	unsigned int height = fractal_get_height(frac); // Variable qui contient la hauteur de la fractale
-    
-    // On parcourt tous les pixels
-	for(unsigned int i = 1; i <= width; i++){
-        
-		for(unsigned int j = 1; j <= height; j++){
-            
-			r = r + fractal_compute_value(frac,i,j);
-		}
-	}
-	return r/(width*height);
-}
 
 
-void* func(){
-	for(int i = 0;i<1000;i++){
-		pthread_mutex_lock(&mutex);
-		global++;
-		pthread_mutex_unlock(&mutex);
-	}
-	return NULL;
-}
-	
 
 int main(int argc, char *argv[]) {
-	struct noeud* head = createNoeu
+	for(int i = 0;i<10;i++){
+		printf("Elément %i du buffer : %s\n",i+1,fractal_get_name(buffer[i]));
+	}
+	char* fname = argv[1];
+	FILE* stream = fopen(fname,"r");
+	char* line = (char*)malloc(sizeof(char)*100);
+	int done = readline(stream,line);
+	struct fractal* frac = create_fractal(line);
+	int err = add_buffer(frac);
+	for(int i = 0;i<10;i++){
+		printf("Elément %i du buffer : %s\n",i+1,fractal_get_name(buffer[i]));
+	}
+	done = readline(stream,line);
+	for(int i = 0;i<10;i++){
+		printf("Elément %i du buffer : %s\n",i+1,fractal_get_name(buffer[i]));
+	}
+	frac = create_fractal(line);
+	err = add_buffer(frac);
+	for(int i = 0;i<10;i++){
+		printf("Elément %i du buffer : %s\n",i+1,fractal_get_name(buffer[i]));
+	}
+	return 0;
 }

@@ -32,6 +32,9 @@ void fractal_free(struct fractal *f)
 
 char *fractal_get_name(struct fractal *f)
 {
+	if(f == NULL){
+		return NULL;
+	}
     return f->name;
 }
 
