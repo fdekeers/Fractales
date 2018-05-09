@@ -10,6 +10,7 @@
 #include <semaphore.h>
 #include <fcntl.h>
 #include <string.h>
+#include <SDL.h>
 
 // Initialisations
 double max;
@@ -26,30 +27,43 @@ struct noeud **head = NULL;
  *
  * @stream : fichier d'entrée
  * @buf : buffer qui a ete rempli par le producteur
- * @return: 0 si le fichier n'est pas fini, 1 si il est fini
+ * @return: 0 si le fichier n'est pas fini, 1 s'il est fini en lisant une fractale, 2 s'il est fini sans lire de fractale
+ *
+ * Testée et fonctionnelle !
  */
 
 int readline(FILE* stream, char* buf){
     
 	int i = 0;
 	char temp = fgetc(stream);
-    
-	// Ligne vide
-	while(temp == '\n'){
-        temp = fgetc(stream);
+	if(temp == EOF){
+		return 2;
 	}
-    
-	// Ligne commençant par '#'
-	while(temp == '#'){
-        
-		while(temp != '\n' && temp != EOF){
-			temp = fgetc(stream);
-			i++;
+	
+	// Lignes qui doivent être passées 
+	while(temp == '\n' || temp == '#'){
+		
+		// Ligne vide
+		while(temp == '\n'){
+        	temp = fgetc(stream);
 		}
+		if(temp == EOF){
+			return 2;
+		}
+		
+		// Ligne commençant par '#'
+		while(temp == '#'){
         
+			while(temp != '\n' && temp != EOF){
+				temp = fgetc(stream);
+			}
+			if(temp == EOF){
+				return 2;
+			}
+			temp = fgetc(stream);
+        
+		}
 	}
-    
-	i = 0;
     
 	while(temp != '\n' && temp != EOF){
 		*(buf+i) = temp;

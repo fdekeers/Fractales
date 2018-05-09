@@ -1,11 +1,11 @@
 export CC = gcc
-export CFLAGS = -g -Wall -W -lpthread -I/usr/include/SDL -L/usr/local/lib -lsdl -I libfractal
+export CFLAGS = -g -Wall -W -lpthread -lSDL -I/usr/include/SDL -I libfractal
 LIB_DIR = libfractal
 LIB = ./libfractal/libfractal.a
 EXE = main
 
 main: main.o lib
-	@$(CC) -o $@ $< $(LIB) -lpthread
+	@$(CC) -o $@ $< $(LIB) -lpthread -lSDL
 
 main.o: main.c lib
 	@$(CC) -o $@ -c $< $(CFLAGS)

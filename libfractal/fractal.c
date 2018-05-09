@@ -6,7 +6,7 @@
 #include "fractal.h"
 
 // Implementation pour les fractales
-struct fractal *fractal_new(const char *name, int width, int height, double a, double b)
+struct fractal *fractal_new(char *name, int width, int height, double a, double b)
 {
 	struct fractal *fr = (struct fractal*)malloc(sizeof(struct fractal));
     if (fr==NULL){
@@ -30,7 +30,7 @@ void fractal_free(struct fractal *f)
     free(f);
 }
 
-const char *fractal_get_name(struct fractal *f)
+char *fractal_get_name(struct fractal *f)
 {
     return f->name;
 }

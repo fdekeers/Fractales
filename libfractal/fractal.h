@@ -7,7 +7,7 @@
 
 // Structure pour les fractales
 struct fractal {
-    const char *name;
+    char *name;
 	unsigned int width;
 	unsigned int height;
 	double a; //partie réelle des coordonnées de la fractale
@@ -26,7 +26,7 @@ struct fractal {
  * @b: partie imaginaire des coordonnées de la fractale
  * @return: un pointeur vers une struct fractal, ou NULL si erreur
  */
-struct fractal *fractal_new(const char *name, int width, int height, double a, double b);
+struct fractal *fractal_new(char *name, int width, int height, double a, double b);
 
 /*
  * fractal_free: libère la mémoire utilisée par une struct fractal
@@ -41,7 +41,7 @@ void fractal_free(struct fractal *f);
  * @f: fractale
  * @return: nom de la fractale
  */
-const char *fractal_get_name(struct fractal *f);
+char *fractal_get_name(struct fractal *f);
 
 /*
  * fractal_get_value: retourne la valeur correspondant à un pixel de l'image

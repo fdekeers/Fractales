@@ -1,60 +1,106 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
+#include "fractal.h"
+#include <pthread.h>
 #include <semaphore.h>
 #include <fcntl.h>
 #include <string.h>
+#include <SDL.h>
+
+int readline(FILE* stream, char* buf){
+    
+	int i = 0;
+	char temp = fgetc(stream);
+	if(temp == EOF){
+		return 2;
+	}
+	
+	// Lignes qui doivent être passées 
+	while(temp == '\n' || temp == '#'){
+		
+		// Ligne vide
+		while(temp == '\n'){
+        	temp = fgetc(stream);
+		}
+		if(temp == EOF){
+			return 2;
+		}
+		
+		// Ligne commençant par '#'
+		while(temp == '#'){
+        
+			while(temp != '\n' && temp != EOF){
+				temp = fgetc(stream);
+			}
+			if(temp == EOF){
+				return 2;
+			}
+			temp = fgetc(stream);
+        
+		}
+	}
+    
+	while(temp != '\n' && temp != EOF){
+		*(buf+i) = temp;
+		temp = fgetc(stream);
+		i++;
+	}
+    
+	if(temp == EOF){
+		return 1; // Fichier termine
+	}
+    
+	return 0; // Fichier non termine
+}
+
+
+
+struct fractal* create_fractal(char* line){
+	int i = 1;
+	char* delim = " "; // On definit le caractere duquel on va se servir pour split notre ligne
+	char* attr[5];
+	attr[0] = strtok(line,delim); // On split la ligne à chaque espace qu'on rencontre
+    
+	while(i<5){
+		attr[i] = strtok(NULL,delim); //  On cree un tableau avec, dans chaque emplacement, un element qui va nous permettre de creer une fractale
+		i++;
+	}
+    
+	return fractal_new(attr[0],atoi(attr[1]),atoi(attr[2]),atof(attr[3]),atof(attr[4])); // Creation d'une nouvelle fractale
+}
 
 int main(int argc, char *argv[]) {
-	printf("argc = %i\n",argc);
-	int nfichiers = argc-2;
-	int d = 0;
-	int maxthreads;
-	char* buffer = (char*)malloc(sizeof(char)*20);
-	if(buffer == NULL){
+	char* fname = argv[1];
+	FILE* stream = fopen(fname,"r");
+	if(stream == NULL){
 		return 1;
 	}
-	
-	
-	for(int a = 1;a<argc-1;a++){
-		printf("Argument %i : %s\n",a,argv[a]);
+	char* line = (char*)malloc(sizeof(char)*100);
+	int done = readline(stream,line);
+	while(done == 0){
+		printf("Ligne lue : %s\n",line);
+		struct fractal* frac = create_fractal(line);
+		printf("Nom de la fractale : %s\n",fractal_get_name(frac));
+		printf("Largeur : %i\n",fractal_get_width(frac));
+		printf("Hauteur : %i\n",fractal_get_height(frac));
+		printf("a = %f\n",fractal_get_a(frac));
+		printf("b = %f\n",fractal_get_b(frac));
+		done = readline(stream,line);
 	}
-	
-	// Prise en compte des arguments de la main
-	for(int i = 1;i<argc;i++){
-		if(strcmp(argv[i],"-d") == 0){
-			d = 1;
-			nfichiers = nfichiers-1;
-			printf("Décrémentation du nombre de fichiers d'entrée\n");
-		}
-		if(strcmp(argv[i],"--maxthreads") == 0){
-			maxthreads = atoi(argv[i+1]);
-			nfichiers = nfichiers-2;
-		}
+	if(done == 1){
+		printf("Ligne lue : %s\n",line);
+		struct fractal* frac = create_fractal(line);
+		printf("Nom de la fractale : %s\n",fractal_get_name(frac));
+		printf("Largeur : %i\n",fractal_get_width(frac));
+		printf("Hauteur : %i\n",fractal_get_height(frac));
+		printf("a = %f\n",fractal_get_a(frac));
+		printf("b = %f\n",fractal_get_b(frac));
 	}
-	printf("Nombre de fichiers de sortie : %i\n",nfichiers);
-	
-	
-	
-	// Création du tableau de fichiers d'entrée
-	char* fichiers[nfichiers];
-	int i = 1;
-	int j = 0;
-	while(i<argc-1 && j<nfichiers){
-		if(strcmp(argv[i],"-d") == 0){
-			i++;
-		}
-		else if(strcmp(argv[i],"--maxthreads") == 0){
-			i = i+2;
-		}
-		else{
-			fichiers[j] = argv[i];
-			i++;
-			j++;
-		}
+	printf("Fin du fichier\n");
+	int err = fclose(stream);
+	if(err != 0){
+		return 1;
 	}
-	
-	for(int k = 0;k<nfichiers;k++){
-		printf("Fichier %i : %s\n",k+1,fichiers[k]);
-	}
+	return 0;
 }
