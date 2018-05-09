@@ -8,8 +8,6 @@
 #include <string.h>
 #include <SDL.h>
 
-struct fractal *buffer[10];
-
 int readline(FILE* stream, char* buf){
     
 	int i = 0;
@@ -72,65 +70,24 @@ struct fractal* create_fractal(char* line){
 	return fractal_new(attr[0],atoi(attr[1]),atoi(attr[2]),atof(attr[3]),atof(attr[4])); // Creation d'une nouvelle fractale
 }
 
-
-int add_buffer(struct fractal *frac){
-    
-	for(int i = 0; i < 10; i++){
-        
-		if(buffer[i] == NULL){
-			buffer[i] = frac; // On ajoute la fractale frac au buffer a l'emplacement i
-			return 0;
-		}
-	}
-	return 1;
-}
-
-
-struct fractal* remove_buffer(){
-    
-	for(int i=0;i<10;i++){
-        
-        // Si il y a un element a l'emplacement i du buffer, on retourne cet element qui est une fractale et on met l'emplacement du buffer a NULL
-		if(buffer[i] != NULL){
-			struct fractal* temp = buffer[i];
-			buffer[i] = NULL;
-			return temp;
-            
-		}
-	}
-	return NULL;
-}
-
-
-
 int main(int argc, char *argv[]) {
-	struct fractal* frac = (struct fractal*)malloc(sizeof(struct fractal));
-	int i = 0;
 	char* fname = argv[1];
 	FILE* stream = fopen(fname,"r");
+	if(stream == NULL){
+		return 1;
+	}
 	char* line = (char*)malloc(sizeof(char)*100);
 	int done = readline(stream,line);
 	while(done == 0){
 		printf("Ligne lue : %s\n",line);
-		frac = create_fractal(line);
+		struct fractal* frac = create_fractal(line);
 		printf("Nom de la fractale : %s\n",fractal_get_name(frac));
 		printf("Largeur : %i\n",fractal_get_width(frac));
 		printf("Hauteur : %i\n",fractal_get_height(frac));
 		printf("a = %f\n",fractal_get_a(frac));
 		printf("b = %f\n",fractal_get_b(frac));
-		int err = add_buffer(frac);
-		if(err == 0){
-			printf("Fractale ajoutée au buffer\n");
-			printf("Fractale à la position %i du buffer : %s\n",i+1,fractal_get_name(buffer[i]));
-			printf("Fractale à la position 1 du buffer : %s\n",fractal_get_name(buffer[0]));
-		}
-		if(err == 1){
-			printf("Fractale non ajoutée au buffer\n");
-		}
 		done = readline(stream,line);
-		i++;
 	}
-	printf("Fractale à la position 1 du buffer : %s\n",fractal_get_name(buffer[0]));
 	if(done == 1){
 		printf("Ligne lue : %s\n",line);
 		struct fractal* frac = create_fractal(line);
@@ -139,16 +96,11 @@ int main(int argc, char *argv[]) {
 		printf("Hauteur : %i\n",fractal_get_height(frac));
 		printf("a = %f\n",fractal_get_a(frac));
 		printf("b = %f\n",fractal_get_b(frac));
-		int err = add_buffer(frac);
-		if(err == 0){
-			printf("Fractale ajoutée au buffer\n");
-			printf("Fractale à la position %i du buffer : %s\n",i+1,fractal_get_name(buffer[i]));
-		}
-		if(err == 1){
-			printf("Fractale non ajoutée au buffer\n");
-		}
 	}
-	struct fractal* fract = remove_buffer();
-	printf("Fractale enlevée du buffer : %s\n",fractal_get_name(fract));
+	printf("Fin du fichier\n");
+	int err = fclose(stream);
+	if(err != 0){
+		return 1;
+	}
 	return 0;
 }

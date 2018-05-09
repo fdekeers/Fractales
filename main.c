@@ -84,6 +84,8 @@ int readline(FILE* stream, char* buf){
  *
  * @line : ligne du fichier avec laquelle on va créer une fractale
  * @return: pointeur vers la fractale qui a ete creee
+ *
+ * Testée et fonctionnelle !
  */
 
 struct fractal* create_fractal(char* line){
