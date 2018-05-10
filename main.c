@@ -109,16 +109,16 @@ struct fractal* create_fractal(char* line){
  * @return: 0 si la fractale a ete ajoutee au buffer correctement, 1 sinon
  */
 
-int add_buffer(struct fractal *frac){
+int add_buffer(struct fractal* frac, struct fractal** buffer){
     
-	for(int i = 0; i < 10; i++){
+	for(int i = 0; i < bufsize; i++){
         
-		if(buffer[i] == NULL){
-			buffer[i] = frac; // On ajoute la fractale frac au buffer a l'emplacement i
-			return 0;
+		if(*(buffer+i) == NULL){
+			*(buffer+i) = frac; // On ajoute la fractale frac au buffer a l'emplacement i
+			break;
 		}
 	}
-	return 1;
+	return 0;
 }
 
 /*
@@ -127,21 +127,20 @@ int add_buffer(struct fractal *frac){
  * @return: la fractale qui a ete retiree du buffer
  */
 
-struct fractal* remove_buffer(){
+struct fractal* remove_buffer(struct fractal** buffer){
     
-	for(int i=0;i<10;i++){
+	for(int i=0;i<bufsize;i++){
         
         // Si il y a un element a l'emplacement i du buffer, on retourne cet element qui est une fractale et on met l'emplacement du buffer a NULL
-		if(buffer[i] != NULL){
-			struct fractal* temp = buffer[i];
-			buffer[i] = NULL;
+		if(*(buffer+i) != NULL){
+			struct fractal* temp = (*buffer+i);
+			*(buffer+i) = NULL;
 			return temp;
             
 		}
 	}
 	return NULL;
 }
-
 
 /*
  * calcul_moyenne : Fonction qui calcule la moyenne de la valeur  d'une fractale sur chaque pixel.
