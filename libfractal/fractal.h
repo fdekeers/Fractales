@@ -132,7 +132,7 @@ struct noeud {
 int push(struct noeud **head, struct noeud *n);
 
 // On retire le noeud qui est a la tete de la pile
-int pop(struct noeud **head);
+struct fractal* pop(struct noeud **head);
 
 struct noeud* createNoeud(struct fractal * f);
 
@@ -140,7 +140,7 @@ void freeNoeud(struct noeud *n);
 
 struct arg_struct {
 	char* line;
-	struct fractal** buffer;
+	struct noeud** head;
 };
 
 

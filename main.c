@@ -14,12 +14,12 @@
 
 // Initialisations
 double max;
-struct fractal *frac_max = NULL;
-struct fractal *buffer[10];
+struct fractal *frac_max;
 pthread_mutex_t mutex;
 sem_t empty;
 sem_t full;
-struct noeud **head = NULL;
+struct noeud **head_buffer;
+struct noeud **head_affiche;
 
 
 /*
@@ -109,16 +109,9 @@ struct fractal* create_fractal(char* line){
  * @return: 0 si la fractale a ete ajoutee au buffer correctement, 1 sinon
  */
 
-int add_buffer(struct fractal* frac, struct fractal** buffer){
-    
-	for(int i = 0; i < bufsize; i++){
-        
-		if(*(buffer+i) == NULL){
-			*(buffer+i) = frac; // On ajoute la fractale frac au buffer a l'emplacement i
-			break;
-		}
-	}
-	return 0;
+int add_buffer(struct fractal* frac){
+	struct noeud* noeud = createNoeud(frac);
+	return push(head,noeud);
 }
 
 /*
@@ -127,19 +120,8 @@ int add_buffer(struct fractal* frac, struct fractal** buffer){
  * @return: la fractale qui a ete retiree du buffer
  */
 
-struct fractal* remove_buffer(struct fractal** buffer){
-    
-	for(int i=0;i<bufsize;i++){
-        
-        // Si il y a un element a l'emplacement i du buffer, on retourne cet element qui est une fractale et on met l'emplacement du buffer a NULL
-		if(*(buffer+i) != NULL){
-			struct fractal* temp = (*buffer+i);
-			*(buffer+i) = NULL;
-			return temp;
-            
-		}
-	}
-	return NULL;
+struct fractal* remove_buffer(){
+    return pop(head);
 }
 
 /*
@@ -213,30 +195,38 @@ void* producteur(struct arg_struct* args){
 		return error;
 	}
     
-	char* line = (char*)malloc(sizeof(char)*100);
-    
-    // On teste si le malloc renvoie une erreur ou ne s'est pas execute correctement
-	if(line == NULL){
-		return error;
-	}
-    
-	printf("Succès de la fonction fopen\n");
     
 	int done = 0;
-    
+	int i = 0;
+	int err;
+	
 	while(done == 0){
+		char* line = (char*)malloc(sizeof(char)*100);
+		// On teste si le malloc renvoie une erreur ou ne s'est pas execute correctement
+		if(line == NULL){
+			return error;
+		}
 		done = readline(stream,line);
-		struct fractal* fra = create_fractal(line);
-		sem_wait(&empty); // On fait attendre la premiere semaphore
-		pthread_mutex_lock(&mutex); // On protege la section critique avec un mutex qu'on bloque
-        // Section critique
-        add_buffer(fra,args->buffer);
-        // Fin de la section critique
-		pthread_mutex_unlock(&mutex); // On debloque le mutex
-        sem_post(&full);
+		printf("Done = %i\n",done);
+		if(done != 2){
+		printf("Ligne lue : %s\n",line);
+			struct fractal* fra = create_fractal(line);
+			sem_wait(&empty); // On fait attendre la premiere semaphore
+			pthread_mutex_lock(&mutex); // On protege la section critique avec un mutex qu'on bloque
+        	// Section critique
+		
+			err = add_buffer(fra);
+			printf("Fractale ajoutée au buffer\n");
+        	// Fin de la section critique
+			pthread_mutex_unlock(&mutex); // On debloque le mutex
+        	sem_post(&full);
+			i++;
+		}
 	}
+	err = fclose(stream);
     return success;
 }
+
 
 /*
  * consommateur : Le consommateur va prendre les données du producteur (le buffer). Il va ensuite calculer la valeur moyenne d'une fractale sur tous les pixels de celle-ci.

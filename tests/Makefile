@@ -10,7 +10,10 @@ test: test.o
 test.o: test.c lib
 	@gcc -o test.o -c test.c $(CFLAGS)
 	
-.PHONY : lib clean
+.PHONY : lib clean debug
+
+debug: test.o
+	@gcc -o test test.o $(LIB) -lpthread -lSDL -g
 
 lib:
 	@(cd $(LIB_DIR) && $(MAKE))

@@ -11,9 +11,7 @@
 pthread_mutex_t mutex;
 sem_t empty;
 sem_t full;
-int global = 0;
-struct fractal **buffer;
-int bufsize = 10;
+struct noeud **head;
 
 
 int readline(FILE* stream, char* buf){
@@ -78,32 +76,14 @@ struct fractal* create_fractal(char* line){
 	return fractal_new(attr[0],atoi(attr[1]),atoi(attr[2]),atof(attr[3]),atof(attr[4])); // Creation d'une nouvelle fractale
 }
 
-int add_buffer(struct fractal* frac, struct fractal** buffer){
-    
-	for(int i = 0; i < bufsize; i++){
-        
-		if(*(buffer+i) == NULL){
-			*(buffer+i) = frac; // On ajoute la fractale frac au buffer a l'emplacement i
-			break;
-		}
-	}
-	return 0;
+int add_buffer(struct fractal* frac){
+	struct noeud* noeud = createNoeud(frac);
+	return push(head,noeud);
 }
 
 
-struct fractal* remove_buffer(struct fractal** buffer){
-    
-	for(int i=0;i<bufsize;i++){
-        
-        // Si il y a un element a l'emplacement i du buffer, on retourne cet element qui est une fractale et on met l'emplacement du buffer a NULL
-		if(*(buffer+i) != NULL){
-			struct fractal* temp = (*buffer+i);
-			*(buffer+i) = NULL;
-			return temp;
-            
-		}
-	}
-	return NULL;
+struct fractal* remove_buffer(){
+    return pop(head);
 }
 
 
@@ -138,11 +118,9 @@ void* producteur(struct arg_struct* args){
 	}
     
     
-    
-	printf("Succès de la fonction fopen\n");
-    
 	int done = 0;
 	int i = 0;
+	int err;
 	
 	while(done == 0){
 		char* line = (char*)malloc(sizeof(char)*100);
@@ -151,76 +129,115 @@ void* producteur(struct arg_struct* args){
 			return error;
 		}
 		done = readline(stream,line);
+		printf("Done = %i\n",done);
+		if(done != 2){
 		printf("Ligne lue : %s\n",line);
-		struct fractal* fra = create_fractal(line);
-		sem_wait(&empty); // On fait attendre la premiere semaphore
-		pthread_mutex_lock(&mutex); // On protege la section critique avec un mutex qu'on bloque
-        // Section critique
+			struct fractal* fra = create_fractal(line);
+			sem_wait(&empty); // On fait attendre la premiere semaphore
+			pthread_mutex_lock(&mutex); // On protege la section critique avec un mutex qu'on bloque
+        	// Section critique
 		
-		int err = add_buffer(fra,args->buffer);
-		
-        // Fin de la section critique
-		pthread_mutex_unlock(&mutex); // On debloque le mutex
-        sem_post(&full);
-		i++;
+			err = add_buffer(fra);
+			printf("Fractale ajoutée au buffer\n");
+        	// Fin de la section critique
+			pthread_mutex_unlock(&mutex); // On debloque le mutex
+        	sem_post(&full);
+			i++;
+		}
 	}
-		
+	err = fclose(stream);
     return success;
 }
 
 int main(int argc, char *argv[]) {
-
-	struct fractal** buffer = (struct fractal**)malloc(sizeof(struct fractal*)*bufsize);
-	for(int i=0;i<bufsize;i++){
-		*(buffer+i) = NULL;
+	
+	
+    head = (struct noeud**)malloc(sizeof(struct noeud*));
+	*head = (struct noeud*)malloc(sizeof(struct noeud));
+	
+	
+	int nfichiers = argc-2;
+	char* destination = argv[argc-1];
+	int d = 0;
+	int maxthreads = 5;
+	
+	// Prise en compte des arguments de la main
+	for(int i = 1;i<argc;i++){
+        
+		if(strcmp(argv[i],"-d") == 0){
+			d = 1;
+			nfichiers = nfichiers-1;
+		}
+        
+		if(strcmp(argv[i],"--maxthreads") == 0){
+			maxthreads = atoi(argv[i+1]);
+			nfichiers = nfichiers-2;
+		}
+	}
+	
+	printf("Nombre de fichiers à lire : %i\n",nfichiers);
+	
+	// Création du tableau de fichiers d'entrée
+	char* fichiers[nfichiers];
+	int i = 1;
+	int j = 0;
+    
+	while(i<argc-1 && j<nfichiers){
+        
+		if(strcmp(argv[i],"-d") == 0){
+			i++;
+		}
+        
+		else if(strcmp(argv[i],"--maxthreads") == 0){
+			i = i+2;
+		}
+        
+		else{
+			fichiers[j] = argv[i];
+			i++;
+			j++;
+		}
+	}
+	
+	for(int i = 0;i<nfichiers;i++){
+		printf("Fichier n.%i : %s\n",i+1,fichiers[i]);
 	}
 	
 	int err = pthread_mutex_init(&(mutex),NULL);
 	err = sem_init(&empty,0,bufsize);
 	err = sem_init(&full,0,0);
 	
-	// Affichage des valeurs du buffer
-	for(int i=0;i<bufsize;i++){
-		if(*(buffer+i) == NULL){
-			printf("Fractale à la position %i : NULL\n",i+1);
-		}
-		else{
-			printf("Fractale à la position %i : %s\n",i+1,fractal_get_name(*(buffer+i)));
-		}
+	struct arg_struct **args = (struct arg_struct**)malloc(sizeof(struct arg_struct*)*nfichiers);
+	for(int i=0;i<nfichiers;i++){
+		*(args+i) = (struct arg_struct*)malloc(sizeof(struct arg_struct));
 	}
-	
-	pthread_t threads[4
-		struct arg_struct* args = (struct arg_struct*)malloc(sizeof(struct arg_struct));
-		args->line = argv[1];
-		args->buffer = buffer;
-		err = pthread_create(&thread,NULL,&producteur,args);
+	printf("coucou\n");
+	pthread_t threads[nfichiers];
+	printf("coucou\n");
+	for(int i = 0;i<nfichiers;i++){
+		(*(args+i))->line = fichiers[i];
+		(*(args+i))->head = head;
+		err = pthread_create(&(threads[i]),NULL,&producteur,*(args+i));
 		if(err != 0){
-			printf("Erreur lors de la création des threads\n");
+			printf("Erreur lors de la création des threads de lecture\n");
 			return 1;
 		}
-	printf("Thread créé\n");
+	}
 
-		err = pthread_join(thread,NULL);
+	for(int i=0;i<nfichiers;i++){
+		err = pthread_join(threads[i],NULL);
 		if(err != 0){
 			printf("Erreur dans la fonction pthread_join\n");
 			return 1;
 		}
-	printf("Threads join\n");
-	
-	// Affichage des valeurs du buffer
-	for(int i=0;i<4;i++){
-		if(*(buffer+i) == NULL){
-			printf("Fractale à la position %i : NULL\n",i+1);
-		}
-		else{
-			printf("Fractale à la position %i : %s\n",i+1,fractal_get_name(*(buffer+i)));
-		}
 	}
+	
+	printf("Head : %s\n",fractal_get_name((*head)->fract));
 	
 	sem_destroy(&full);
 	sem_destroy(&empty);
 	
+	
 	return 0;
 		
 }
-

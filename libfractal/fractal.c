@@ -88,10 +88,15 @@ void freeNoeud(struct noeud *n){
 // Repris d'Inginious
 int push(struct noeud **head, struct noeud *n){
     if (head==NULL) {
-        return 1;
+        head = (struct noeud**)malloc(sizeof(struct noeud*));
+		*head = (struct noeud*)malloc(sizeof(struct noeud));
+		*head = n;
+		return 0;
     }
     if (*head==NULL) {
-        return 1;
+        *head = (struct noeud*)malloc(sizeof(struct noeud));
+		*head = n;
+		return 0;
     }
     if (n==NULL) {
         return 1;
@@ -106,20 +111,19 @@ int push(struct noeud **head, struct noeud *n){
 
 // On retire le noeud present a la tete de la pile
 // Repris d'Inginious
-int pop(struct noeud **head){
+struct fractal* pop(struct noeud **head){
     if (head==NULL) {
-        return 1;
+        return NULL;
     }
     if (*head==NULL) {
-        return 1;
+        return NULL;
     }
     struct noeud * n = (*head);
     if (n->next == NULL){
-        freeNoeud(n);
-        return 0;
+		head = NULL;
+        return n->fract;
     }
     (*head)=n->next;
-    freeNoeud(n);
-    return 0;
+    return n->fract;
 }
 
