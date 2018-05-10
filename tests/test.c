@@ -12,6 +12,8 @@ pthread_mutex_t mutex;
 sem_t empty;
 sem_t full;
 int global = 0;
+struct fractal **buffer;
+int bufsize = 4;
 
 
 int readline(FILE* stream, char* buf){
@@ -76,17 +78,16 @@ struct fractal* create_fractal(char* line){
 	return fractal_new(attr[0],atoi(attr[1]),atoi(attr[2]),atof(attr[3]),atof(attr[4])); // Creation d'une nouvelle fractale
 }
 
-/*
 int add_buffer(struct fractal* frac){
     
-	for(int i = 0; i < 10; i++){
+	for(int i = 0; i < 4; i++){
         
-		if(buffer[i] == NULL){
-			buffer[i] = frac; // On ajoute la fractale frac au buffer a l'emplacement i
-			return 0;
+		if(*(buffer+i) == NULL){
+			*(buffer+i) = frac; // On ajoute la fractale frac au buffer a l'emplacement i
+			break;
 		}
 	}
-	return 1;
+	return 0;
 }
 
 
@@ -104,7 +105,7 @@ struct fractal* remove_buffer(){
 	}
 	return NULL;
 }
-*/
+
 
 double calcul_moyenne(struct fractal *frac){
     
@@ -122,34 +123,75 @@ double calcul_moyenne(struct fractal *frac){
 	}
 	return r/(width*height);
 }
-
-
-void* func(){
-	for(int i = 0;i<1000;i++){
-		pthread_mutex_lock(&mutex);
-		global++;
-		pthread_mutex_unlock(&mutex);
-	}
-	return NULL;
-}
 	
 
+void* func(struct arg_struct* args){
+	struct fractal* frac = create_fractal(args->line);
+	pthread_mutex_lock(&mutex);
+	for(int i = 0; i < 4; i++){
+		if(*((args->buffer)+i) == NULL){
+			*((args->buffer)+i) = frac; // On ajoute la fractale frac au buffer a l'emplacement i
+			break;
+		}
+	}
+	pthread_mutex_unlock(&mutex);
+}
+
+
 int main(int argc, char *argv[]) {
-	struct noeud** head = (struct noeud**)malloc(sizeof(struct noeud*));
-	char* line = argv[1];
-	struct fractal* frac = create_fractal(line);
-	printf("Nom de la fractale : %s\n",fractal_get_name(frac));
-	printf("Largeur : %i\n",fractal_get_width(frac));
-	printf("Hauteur : %i\n",fractal_get_height(frac));
-	printf("a = %f\n",fractal_get_a(frac));
-	printf("b = %f\n",fractal_get_b(frac));
-	struct noeud* noeud = createNoeud(frac);
-	*head = noeud;
-	printf("Fractale dans le noeud : %s\n",fractal_get_name(noeud->fract));
-	printf("Fractale dans le noeud : %s\n",fractal_get_name((*head)->fract));
-	line = argv[2];
-	frac = create_fractal(line);
-	int err = push(head,createNoeud(frac));
-	printf("Fractale dans le noeud 2 : %s\n",fractal_get_name((*head)->fract));
+	
+	struct fractal** buffer = (struct fractal**)malloc(sizeof(struct fractal*)*4);
+	for(int i=0;i<4;i++){
+		*(buffer+i) = NULL;
+	}
+	
+	int err = pthread_mutex_init(&(mutex),NULL);
+	err = sem_init(&empty,0,10);
+	err = sem_init(&full,0,0);
+	
+	// Affichage des valeurs du buffer
+	for(int i=0;i<4;i++){
+		if(*(buffer+i) == NULL){
+			printf("Fractale à la position %i : NULL\n",i+1);
+		}
+		else{
+			printf("Fractale à la position %i : %s\n",i+1,fractal_get_name(*(buffer+i)));
+		}
+	}
+	
+	pthread_t threads[4];
+	for(int i=0;i<4;i++){
+		struct arg_struct* args = (struct arg_struct*)malloc(sizeof(struct arg_struct));
+		args->line = argv[i+1];
+		args->buffer = buffer;
+		err = pthread_create(&(threads[i]),NULL,&func,args);
+		if(err != 0){
+			printf("Erreur lors de la création des threads\n");
+			return 1;
+		}
+	}
+	printf("Threds créés\n");
+	
+	for(int i=0;i<4;i++){
+		err = pthread_join(threads[i],NULL);
+		if(err != 0){
+			printf("Erreur dans la fonction pthread_join\n");
+			return 1;
+		}
+	}
+	printf("Threads join\n");
+	
+	// Affichage des valeurs du buffer
+	for(int i=0;i<4;i++){
+		if(*(buffer+i) == NULL){
+			printf("Fractale à la position %i : NULL\n",i+1);
+		}
+		else{
+			printf("Fractale à la position %i : %s\n",i+1,fractal_get_name(*(buffer+i)));
+		}
+	}
 	return 0;
 }
+
+
+

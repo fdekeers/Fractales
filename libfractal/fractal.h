@@ -138,5 +138,10 @@ struct noeud* createNoeud(struct fractal * f);
 
 void freeNoeud(struct noeud *n);
 
+struct arg_struct {
+	char* line;
+	struct fractal** buffer;
+};
+
 
 #endif
