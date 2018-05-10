@@ -71,3 +71,34 @@ void test_fractale_get_b(void){
     fractal_free(frac_test);
 }
 
+// Test de la fonction push()
+void test_push(void){
+    struct fractal * frac_test1 = fractal_new("fractale37", 600,1000, -0.7,0.6);
+    struct fractal * frac_test2 = fractal_new("fractale38", 500,1100, -0.4,0.9);
+    
+    noeud * n = createNoeud(frac_test1);
+    push(n,frac_test2);
+    noeud * runner = n;
+    CU_ASSERT_STRING_EQUAL("fractale38",(runner->fractal->name));
+    runner = runnuer->next;
+    freeNoeud(runner);
+    CU_ASSERT_STRING_EQUAL("fractale37",(runner->fractal->name));
+    fractal_free(frac_test1);
+    fractal_free(frac_test2);
+    freeNoeud(runner);
+}
+
+// Test de la fonction pop()
+void test_pop(void){
+    struct fractal * frac_test1 = fractal_new("fractale37", 600,1000, -0.7,0.6);
+    struct fractal * frac_test2 = fractal_new("fractale38", 500,1100, -0.4,0.9);
+    
+    noeud * n = createNoeud(frac_test1);
+    push(n,frac_test2);
+    pop(frac_test2);
+    noeud * runner = n;
+    CU_ASSERT_STRING_EQUAL("fractale37",(runner->fractal->name));
+    freeNoeud(runner);
+    fractal_free(frac_test1);
+}
+
