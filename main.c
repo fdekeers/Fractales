@@ -201,12 +201,12 @@ void max_fractale(struct fractal *frac){
  * @return: 0 si la fonction a execute le code avec succes, 1 sinon
  */
 
-void* producteur(char* filename){
+void* producteur(struct arg_struct* args){
 	int* error = (int*)malloc(sizeof(int));
 	int* success = (int*)malloc(sizeof(int));
 	*error = 1;
 	*success = 0;
-    FILE *stream = fopen(filename,"r");
+    FILE *stream = fopen(args->line,"r");
     
     // On teste si la fonction fopen a echoue
 	if(stream == NULL){
@@ -230,7 +230,7 @@ void* producteur(char* filename){
 		sem_wait(&empty); // On fait attendre la premiere semaphore
 		pthread_mutex_lock(&mutex); // On protege la section critique avec un mutex qu'on bloque
         // Section critique
-        add_buffer(fra);
+        add_buffer(fra,args->buffer);
         // Fin de la section critique
 		pthread_mutex_unlock(&mutex); // On debloque le mutex
         sem_post(&full);

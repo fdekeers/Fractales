@@ -13,7 +13,7 @@ sem_t empty;
 sem_t full;
 int global = 0;
 struct fractal **buffer;
-int bufsize = 4;
+int bufsize = 10;
 
 
 int readline(FILE* stream, char* buf){
@@ -125,27 +125,62 @@ double calcul_moyenne(struct fractal *frac){
 }
 	
 
-void* func(struct arg_struct* args){
-	struct fractal* frac = create_fractal(args->line);
-	pthread_mutex_lock(&mutex);
-	int err = add_buffer(frac,args->buffer);
-	pthread_mutex_unlock(&mutex);
+void* producteur(struct arg_struct* args){
+	int* error = (int*)malloc(sizeof(int));
+	int* success = (int*)malloc(sizeof(int));
+	*error = 1;
+	*success = 0;
+    FILE *stream = fopen(args->line,"r");
+    
+    // On teste si la fonction fopen a echoue
+	if(stream == NULL){
+		return error;
+	}
+    
+    
+    
+	printf("Succès de la fonction fopen\n");
+    
+	int done = 0;
+	int i = 0;
+	
+	while(done == 0){
+		char* line = (char*)malloc(sizeof(char)*100);
+		// On teste si le malloc renvoie une erreur ou ne s'est pas execute correctement
+		if(line == NULL){
+			return error;
+		}
+		done = readline(stream,line);
+		printf("Ligne lue : %s\n",line);
+		struct fractal* fra = create_fractal(line);
+		sem_wait(&empty); // On fait attendre la premiere semaphore
+		pthread_mutex_lock(&mutex); // On protege la section critique avec un mutex qu'on bloque
+        // Section critique
+		
+		int err = add_buffer(fra,args->buffer);
+		
+        // Fin de la section critique
+		pthread_mutex_unlock(&mutex); // On debloque le mutex
+        sem_post(&full);
+		i++;
+	}
+		
+    return success;
 }
 
-
 int main(int argc, char *argv[]) {
-	
-	struct fractal** buffer = (struct fractal**)malloc(sizeof(struct fractal*)*4);
-	for(int i=0;i<4;i++){
+
+	struct fractal** buffer = (struct fractal**)malloc(sizeof(struct fractal*)*bufsize);
+	for(int i=0;i<bufsize;i++){
 		*(buffer+i) = NULL;
 	}
 	
 	int err = pthread_mutex_init(&(mutex),NULL);
-	err = sem_init(&empty,0,10);
+	err = sem_init(&empty,0,bufsize);
 	err = sem_init(&full,0,0);
 	
 	// Affichage des valeurs du buffer
-	for(int i=0;i<4;i++){
+	for(int i=0;i<bufsize;i++){
 		if(*(buffer+i) == NULL){
 			printf("Fractale à la position %i : NULL\n",i+1);
 		}
@@ -154,26 +189,22 @@ int main(int argc, char *argv[]) {
 		}
 	}
 	
-	pthread_t threads[4];
-	for(int i=0;i<4;i++){
+	pthread_t threads[4
 		struct arg_struct* args = (struct arg_struct*)malloc(sizeof(struct arg_struct));
-		args->line = argv[i+1];
+		args->line = argv[1];
 		args->buffer = buffer;
-		err = pthread_create(&(threads[i]),NULL,&func,args);
+		err = pthread_create(&thread,NULL,&producteur,args);
 		if(err != 0){
 			printf("Erreur lors de la création des threads\n");
 			return 1;
 		}
-	}
-	printf("Threds créés\n");
-	
-	for(int i=0;i<4;i++){
-		err = pthread_join(threads[i],NULL);
+	printf("Thread créé\n");
+
+		err = pthread_join(thread,NULL);
 		if(err != 0){
 			printf("Erreur dans la fonction pthread_join\n");
 			return 1;
 		}
-	}
 	printf("Threads join\n");
 	
 	// Affichage des valeurs du buffer
@@ -185,6 +216,11 @@ int main(int argc, char *argv[]) {
 			printf("Fractale à la position %i : %s\n",i+1,fractal_get_name(*(buffer+i)));
 		}
 	}
+	
+	sem_destroy(&full);
+	sem_destroy(&empty);
+	
 	return 0;
+		
 }
 
