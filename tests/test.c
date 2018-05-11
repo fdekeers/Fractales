@@ -8,10 +8,13 @@
 #include <string.h>
 #include <SDL.h>
 
-pthread_mutex_t mutex;
+pthread_mutex_t mutex_buffer;
+pthread_mutex_t mutex_lecture;
 sem_t empty;
 sem_t full;
+int bufsize = 100;
 struct noeud **head;
+int lecture = 0;
 
 
 int readline(FILE* stream, char* buf){
@@ -134,13 +137,13 @@ void* producteur(struct arg_struct* args){
 		printf("Ligne lue : %s\n",line);
 			struct fractal* fra = create_fractal(line);
 			sem_wait(&empty); // On fait attendre la premiere semaphore
-			pthread_mutex_lock(&mutex); // On protege la section critique avec un mutex qu'on bloque
+			pthread_mutex_lock(&mutex_buffer); // On protege la section critique avec un mutex qu'on bloque
         	// Section critique
 		
-			err = add_buffer(fra);
+			err = push(head,createNoeud(fra));
 			printf("Fractale ajoutée au buffer\n");
         	// Fin de la section critique
-			pthread_mutex_unlock(&mutex); // On debloque le mutex
+			pthread_mutex_unlock(&mutex_buffer); // On debloque le mutex
         	sem_post(&full);
 			i++;
 		}
@@ -149,9 +152,45 @@ void* producteur(struct arg_struct* args){
     return success;
 }
 
+void* consommateur (){
+	int* error = (int*)malloc(sizeof(int));
+	int* success = (int*)malloc(sizeof(int));
+	*error = 1;
+	*success = 0;
+	struct fractal* frac = (struct fractal*)malloc(sizeof(struct fractal));
+    
+    // On teste si le malloc renvoie une erreur ou ne s'est pas execute correctement
+    if (frac == NULL){
+        return error;
+    }
+    
+    while(1==1){
+        sem_wait(&full);
+        pthread_mutex_lock(&mutex_buffer); // On protege la section critique avec un mutex qu'on bloque
+        // Section critique
+        frac = pop(head);
+        printf("Fractale enlevée : %s\n",fractal_get_name(frac));
+		printf("Head : %s\n",fractal_get_name((*head)->fract));
+        // Fin de la section critique
+        pthread_mutex_unlock(&mutex_buffer); // On debloque le mutex
+        sem_post(&empty);
+    }
+    return success;
+}
+
 int main(int argc, char *argv[]) {
 	
+	head = (struct noeud**)malloc(sizeof(struct noeud*));
+	*head = (struct noeud*)malloc(sizeof(struct noeud));
+	*head = createNoeud(create_fractal(argv[1]));
+	printf("head : %s\n",fractal_get_name((*head)->fract));
+	struct fractal* frac = pop(head);
+	printf("Fractale enlevée : %s\n",fractal_get_name(frac));
+	if(head == NULL){
+		printf("head == NULL\n");
+	}
 	
+	/*
     head = (struct noeud**)malloc(sizeof(struct noeud*));
 	*head = (struct noeud*)malloc(sizeof(struct noeud));
 	
@@ -203,7 +242,10 @@ int main(int argc, char *argv[]) {
 		printf("Fichier n.%i : %s\n",i+1,fichiers[i]);
 	}
 	
-	int err = pthread_mutex_init(&(mutex),NULL);
+	printf("Maxthreads : %i\n",maxthreads);
+	
+	int err = pthread_mutex_init(&(mutex_buffer),NULL);
+	err = pthread_mutex_init(&(mutex_lecture),NULL);
 	err = sem_init(&empty,0,bufsize);
 	err = sem_init(&full,0,0);
 	
@@ -222,6 +264,10 @@ int main(int argc, char *argv[]) {
 			printf("Erreur lors de la création des threads de lecture\n");
 			return 1;
 		}
+		pthread_mutex_lock(&mutex_lecture);
+		lecture++;
+		printf("Lecture = %i\n",lecture);
+		pthread_mutex_unlock(&mutex_lecture);
 	}
 
 	for(int i=0;i<nfichiers;i++){
@@ -230,14 +276,38 @@ int main(int argc, char *argv[]) {
 			printf("Erreur dans la fonction pthread_join\n");
 			return 1;
 		}
+		pthread_mutex_lock(&mutex_lecture);
+		lecture = lecture - 2;
+		pthread_mutex_unlock(&mutex_lecture);
 	}
 	
-	printf("Head : %s\n",fractal_get_name((*head)->fract));
+	// Threads de calcul
+	pthread_t threads_calcul[maxthreads];
+    
+	for(int i = 0;i<maxthreads;i++){
+        
+		err = pthread_create(&(threads_calcul[i]),NULL,&(consommateur),NULL);
+        
+		if(err != 0){
+			printf("Erreur lors de la création des threads de calcul\n");
+			return 1;
+		}
+	}
+	
+	for(int i = 0;i<maxthreads;i++){
+        int *r;
+		err = pthread_join(threads_calcul[i],(void**)&r);
+		free(r);
+        
+		if(err != 0){
+			printf("Erreur dans la fonction pthread_join\n");
+			return 1;
+		}
+	}
 	
 	sem_destroy(&full);
 	sem_destroy(&empty);
-	
+	*/
 	
 	return 0;
-		
 }

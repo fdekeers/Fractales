@@ -18,6 +18,7 @@ struct fractal *frac_max;
 pthread_mutex_t mutex;
 sem_t empty;
 sem_t full;
+int bufsize = 100;
 struct noeud **head_buffer;
 struct noeud **head_affiche;
 
@@ -100,28 +101,6 @@ struct fractal* create_fractal(char* line){
 	}
     
 	return fractal_new(attr[0],atoi(attr[1]),atoi(attr[2]),atof(attr[3]),atof(attr[4])); // Creation d'une nouvelle fractale
-}
-
-/*
- * add_buffer : Fonction qui ajoute une fractale dans le buffer.
- *
- * @frac : représente la fractale à ajouter au buffer
- * @return: 0 si la fractale a ete ajoutee au buffer correctement, 1 sinon
- */
-
-int add_buffer(struct fractal* frac){
-	struct noeud* noeud = createNoeud(frac);
-	return push(head,noeud);
-}
-
-/*
- * remove_buffer : Fonction qui retire une fractale buffer et remet la case a NULL.
- *
- * @return: la fractale qui a ete retiree du buffer
- */
-
-struct fractal* remove_buffer(){
-    return pop(head);
 }
 
 /*
@@ -247,16 +226,15 @@ void* consommateur (){
         return error;
     }
     
-    while (1==1){
+    for(int i=0;i<7;i++){
         sem_wait(&full);
         pthread_mutex_lock(&mutex); // On protege la section critique avec un mutex qu'on bloque
         // Section critique
         frac = remove_buffer();
-        max_fractale(frac);
+        printf("Fractale enlevée : %s\n",fractal_get_name(frac);
         // Fin de la section critique
         pthread_mutex_unlock(&mutex); // On debloque le mutex
         sem_post(&empty);
-		max_fractale(frac);
     }
     return success;
 }
@@ -296,6 +274,9 @@ void frac_affiche(struct noeud ** head, char* destination){
  */
 
 int main(int argc, char *argv[]){
+	
+	head_buffer = (struct noeud**)malloc(sizeof(struct noeud*));
+	*head_buffer = (struct noeud*)malloc(sizeof(struct noeud));
     
 	int nfichiers = argc-2;
 	char* destination = argv[argc-1];
@@ -344,11 +325,16 @@ int main(int argc, char *argv[]){
 	err = sem_init(&empty,0,10);
 	err = sem_init(&full,0,0);
 	
+	struct arg_struct **args = (struct arg_struct**)malloc(sizeof(struct arg_struct*)*nfichiers);
+	for(int i=0;i<nfichiers;i++){
+		*(args+i) = (struct arg_struct*)malloc(sizeof(struct arg_struct));
+	}
+	
 	pthread_t threads_lecture[nfichiers];
     
 	for(int i = 0;i<nfichiers;i++){
         
-		err = pthread_create(&(threads_lecture[i]),NULL,&(producteur),(void*)fichiers[i]);
+		err = pthread_create(&(threads_lecture[i]),NULL,&(producteur),*(args+i));
         
 		if(err != 0){
 			printf("Erreur lors de la création des threads de lecture\n");
