@@ -12,8 +12,8 @@ pthread_mutex_t mutex_buffer;
 pthread_mutex_t mutex_lecture;
 sem_t empty;
 sem_t full;
-struct fractal *buffer[100] = {NULL};
-int bufsize = 100;
+struct fractal *buffer[10] = {NULL};
+int bufsize = 10;
 int lecture = 0;
 
 
@@ -164,6 +164,17 @@ void* producteur(char* fname){
 		
 			err = add_buffer(fra);
 			printf("Fractale ajoutée au buffer\n");
+			
+			// Affichage du buffer
+			for(int i=0;i<bufsize;i++){
+				if(*(buffer+i)==NULL){
+					printf("Fractale à la position %i : NULL\n",i+1);
+				}
+				else{
+					printf("Fractale à la position %i : %s\n",i+1,fractal_get_name(*(buffer+i)));
+				}
+			}
+						
         	// Fin de la section critique
 			pthread_mutex_unlock(&mutex_buffer); // On debloque le mutex
         	sem_post(&full);
@@ -180,6 +191,7 @@ void* consommateur (){
 	*error = 1;
 	*success = 0;
     
+	
     while((buffer_empty() != 1) || (lecture != 0)){
         sem_wait(&full);
         pthread_mutex_lock(&mutex_buffer); // On protege la section critique avec un mutex qu'on bloque
