@@ -9,23 +9,31 @@ int main(int argc, char *argv[])
 {
     CU_pSuite pSuite = NULL;
     CU_initialize_registry(); // On initialise le registre
+    
     if (CUE_SUCCESS != CU_initialize_registry()){ // On teste si l'initialisation s'est déroulee correctement
         CU_cleanup_registry(); // On libere le registre qui a ete cree
         return CU_get_error(); // Si il y a eu un problème on retourne le code d'erreur
     }
+    
     pSuite = CU_add_suite("ma_suite", 0, 0);
     else if ((NULL == CU_add_test(pSuite, "Test assert string equal", test_fractale_get_name)) ||
              (NULL == CU_add_test(pSuite, "Test assert equal", test_fractale_get_value)) ||
              (NULL == CU_add_test(pSuite, "Test assert equal", test_fractale_get_width)) ||
              (NULL == CU_add_test(pSuite, "Test assert equal", test_fractale_get_heigth)) ||
              (NULL == CU_add_test(pSuite, "Test assert equal", test_fractale_get_a)) ||
-             (NULL == CU_add_test(pSuite, "Test assert equal", test_fractale_get_b))){
+             (NULL == CU_add_test(pSuite, "Test assert equal", test_fractale_get_b))
+             (NULL == CU_add_test(pSuite, "Test assert equal", test_push))||
+             (NULL == CU_add_test(pSuite, "Test assert equal", test_pop))||
+             (NULL == CU_add_test(pSuite, "Test assert ptr null", test_remove_buffer))){
         CU_cleanup_registry(); // On libere le registre qui a ete cree
         return CU_get_error(); // Si il y a eu un problème on retourne le code d'erreur
     }
+    
     CU_basic_run_tests(); // On fait tourner les tests que nous avons cree
     CU_basic_show_failures(CU_get_failure_list()); // On affiche les erreurs
     CU_cleanup_registry(); // On libere le registre qui a ete cree
+    
+    return CU_get_error();
 }
 
 // Test de la fonction fractal_get_name()
@@ -100,5 +108,38 @@ void test_pop(void){
     CU_ASSERT_STRING_EQUAL("fractale37",(runner->fractal->name));
     freeNoeud(runner);
     fractal_free(frac_test1);
+}
+
+// Test de la fonction buffer_empty()
+void test_remove_buffer(void){
+    struct fractal * buffer;
+        if(NULL!=buffer){
+            remove_buffer();
+            CU_ASSERT_PTR_NULL(buffer);
+    }
+}
+
+// Test de la fonction add_buffer()
+void test_add_buffer(void){
+    struct fractal * buffer[10] = {NULL};
+    struct fractal * frac_test;
+    add_buffer(frac_test);
+    CU_ASSERT_PTR_NOT_NULL(buffer);
+}
+
+// Test de la fonction buffer_empty() (On teste pour un buffer vide)
+void test_buffer_empty(void){
+    struct fractal * buffer[10] = {NULL};
+    int value = buffer_empty();
+    CU_ASSERT_EQUAL(value,1);
+}
+
+// Test de la fonction buffer_empty() (On teste pour un buffer non vide)
+void test_buffer_empty(void){
+    struct fractal * buffer[10] = {NULL};
+    struct fractal * frac_test;
+    add_buffer(frac_test);
+    int value = buffer_empty();
+    CU_ASSERT_EQUAL(value,0);
 }
 
