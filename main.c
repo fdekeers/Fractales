@@ -221,9 +221,7 @@ void max_fractale(struct fractal *frac){
 
 void* producteur(char* fname){
     int* error = (int*)malloc(sizeof(int));
-    int* success = (int*)malloc(sizeof(int));
-    *error = 1;
-    *success = 0;
+    *error = 0;
     FILE *stream = fopen(fname,"r");
     
     // On teste si la fonction fopen a echoue
@@ -234,7 +232,6 @@ void* producteur(char* fname){
     
     int done = 0;
     int i = 0;
-    int err;
     
     while(done == 0){
         char* line = (char*)malloc(sizeof(char)*100);
@@ -253,7 +250,7 @@ void* producteur(char* fname){
             pthread_mutex_lock(&mutex_buffer);
             
             // Debut de la section critique
-            err = add_buffer(fra);
+            *error = add_buffer(fra);
             printf("Fractale ajoutée au buffer\n");
             
             // Affichage du buffer
@@ -273,16 +270,46 @@ void* producteur(char* fname){
             i++;
         }
     }
-    err = fclose(stream);
-    return success;
+    *error = fclose(stream);
+    return error;
 }
 
-/*
- * consommateur : Le consommateur va prendre les données du producteur (le buffer). Il va ensuite calculer la valeur moyenne d'une fractale sur tous les pixels de celle-ci.
- *                Elle fait entrer en jeu des threads de calcul.
- *
- * @return: succes (0) si la fonction a execute le code avec succes, erreur (1) sinon
- */
+
+void* read_std(){
+    int* error = (int*)malloc(sizeof(int));
+    *error = 0;
+    char* name = (char*)malloc(sizeof(char)*64);
+    // On teste si le malloc renvoie une erreur ou ne s'est pas execute correctement
+        if(name == NULL){
+            return error;
+        }
+    int* width = (int*)malloc(sizeof(int));
+    int* height = (int*)malloc(sizeof(int));
+    double* a = (double*)malloc(sizeof(a));
+    double* b = (double*)malloc(sizeof(b));
+    printf("Ecrivez des descriptions de fractales\n");
+    int chars = scanf("%s %i %i %lf %lf",name,width,height,a,b);
+        struct fractal* frac = fractal_new(name,*width,*height,*a,*b);
+        sem_wait(&empty);
+        pthread_mutex_lock(&mutex_buffer);
+        *error = add_buffer(frac);
+        printf("Fractale ajoutée au buffer\n");
+            
+        // Affichage du buffer
+        for(int i=0;i<bufsize;i++){
+            if(*(buffer+i)==NULL){
+                printf("Fractale à la position %i : NULL\n",i+1);
+            }
+            else{
+                printf("Fractale à la position %i : %s\n",i+1,fractal_get_name(*(buffer+i)));
+            }
+        }
+        pthread_mutex_unlock(&mutex_buffer);
+        sem_post(&full);
+    return error;
+}
+
+
 
 void* consommateur (int* d){
     
@@ -307,7 +334,6 @@ void* consommateur (int* d){
 		max_fractale(frac);
 		if(*d == 1){
 			int err = write_bitmap_sdl(frac,fractal_get_name(frac));
-			printf("Affiche la fractale");
 		}
 		*error = sem_getvalue(&full,sval);
         // On debloque le mutex
@@ -321,7 +347,7 @@ void* consommateur (int* d){
         
         *error = sem_getvalue(&full,sval);
     }
-    return success;
+    return error;
 }
 
 /*
@@ -342,22 +368,30 @@ int main(int argc, char *argv[]) {
     int dval = 0;
     int *d = &dval;
     int maxthreads = 5;
+    int stdread = 0;
     
     // Prise en compte des arguments de la main
     for(int i = 1;i<argc;i++){
         
         if(strcmp(argv[i],"-d") == 0){
             *d = 1;
-            nfichiers = nfichiers-1;
+            nfichiers--;
         }
         
         if(strcmp(argv[i],"--maxthreads") == 0){
             maxthreads = atoi(argv[i+1]);
             nfichiers = nfichiers-2;
         }
+        
+        if(strcmp(argv[i],"-") == 0){
+            stdread = 1;
+            nfichiers--;
+        }
     }
     
-    printf("Nombre de fichiers à lire : %i\n",nfichiers);
+    if(stdread == 1){
+        printf("Lire sur l'entrée principale\n");
+    }
     
     // Création du tableau de fichiers d'entrée
     char* fichiers[nfichiers];
@@ -372,6 +406,10 @@ int main(int argc, char *argv[]) {
         
         else if(strcmp(argv[i],"--maxthreads") == 0){
             i = i+2;
+        }
+        
+        else if(strcmp(argv[i],"-") == 0){
+            i++;
         }
         
         else{
@@ -406,6 +444,31 @@ int main(int argc, char *argv[]) {
         lecture++;
         pthread_mutex_unlock(&mutex_lecture);
     }
+    
+    if(stdread == 1){
+        pthread_t thread_std;
+        err = pthread_create(&thread_std,NULL,&read_std,NULL);
+        if(err != 0){
+            printf("Erreur lors de la création du thread de lecture\n");
+            return 1; // Erreur
+        }
+        // lecture est une varibale globale, on protege sa modification par un mutex pour que 2 threads ne changent pas sa valeur en meme temps
+        pthread_mutex_lock(&mutex_lecture);
+        lecture++;
+        pthread_mutex_unlock(&mutex_lecture);
+        
+        
+        err = pthread_join(thread_std,NULL);
+        if(err != 0){
+            printf("Erreur lors de la fonction pthread_join\n");
+            return 1; // Erreur
+        }
+        // lecture est une varibale globale, on protege sa modification par un mutex pour que 2 threads ne changent pas sa valeur en meme temps
+        pthread_mutex_lock(&mutex_lecture);
+        lecture--;
+        pthread_mutex_unlock(&mutex_lecture);
+    }
+        
     
     for(int i=0;i<nfichiers;i++){
         
@@ -464,11 +527,11 @@ int main(int argc, char *argv[]) {
         char* fname = (char*)malloc(sizeof(char)*100);
         
         if(k==0){
-            fname = destination;
+            err = sprintf(fname,"%s.bmp",destination);
         }
         
         else{
-            err = sprintf(fname,"%s(%i)",destination,k);
+            err = sprintf(fname,"%s(%i).bmp",destination,k);
         }
         
         // On affiche les noeuds de la pile un par un

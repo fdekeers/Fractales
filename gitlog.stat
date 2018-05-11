@@ -1,3 +1,43 @@
+commit ace325f5660275cc357e7c0b5198fc3c3eeac254
+Merge: 09beee2 5b9cc18
+Author: François De Keersmaeker <francoisdekeersmaeker8@gmail.com>
+Date:   Fri May 11 16:08:33 2018 +0200
+
+    Finition
+
+commit 09beee2f6c4f20919e1cfd8f2bd4c885f43cdfeb
+Author: François De Keersmaeker <francoisdekeersmaeker8@gmail.com>
+Date:   Fri May 11 15:58:20 2018 +0200
+
+    amélioration
+
+ main.c | 1 +
+ 1 file changed, 1 insertion(+)
+
+commit 5b9cc18f703f182aa9266d6160f6c0788cdf7df8
+Author: Margaux GERARD <margaux.gerard@student.uclouvain.be>
+Date:   Fri May 11 15:53:06 2018 +0200
+
+    Commentaires
+
+ main.c | 608 +++++++++++++++++++++++++++++++++++------------------------------
+ 1 file changed, 327 insertions(+), 281 deletions(-)
+
+commit 392f4b2a55b2218961a27d1882b78b1ab1268e0d
+Author: François De Keersmaeker <francoisdekeersmaeker8@gmail.com>
+Date:   Fri May 11 15:23:48 2018 +0200
+
+    Finition du projet
+
+ Makefile       |   2 +-
+ gitlog.stat    | 627 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ main.c         |  12 +-
+ tests/fichier1 |   6 -
+ tests/fichier2 |   3 -
+ tests/fichier3 |   3 -
+ tests/fichier4 |   1 -
+ 7 files changed, 634 insertions(+), 20 deletions(-)
+
 commit ab3f835efc4c049d0140d8ea02bf54c1eb563689
 Author: François De Keersmaeker <francoisdekeersmaeker8@gmail.com>
 Date:   Fri May 11 15:09:17 2018 +0200
