@@ -15,8 +15,8 @@
 // Initialisations
 double max;
 pthread_mutex_t mutex_buffer;
-pthread_mutex_t mutex_lecture;
 pthread_mutex_t mutex_max;
+pthread_mutex_t mutex_lecture;
 sem_t empty;
 sem_t full;
 struct fractal *buffer[10] = {NULL};
@@ -32,7 +32,6 @@ struct noeud **head;
  * @buf : buffer qui a ete rempli par le producteur
  * @return: 0 si le fichier n'est pas fini, 1 s'il est fini en lisant une fractale, 2 s'il est fini sans lire de fractale
  *
- * Testée et fonctionnelle !
  */
 
 int readline(FILE* stream, char* buf){
@@ -88,7 +87,6 @@ int readline(FILE* stream, char* buf){
  * @line : ligne du fichier avec laquelle on va créer une fractale
  * @return: pointeur vers la fractale qui a ete creee
  *
- * Testée et fonctionnelle !
  */
 
 struct fractal* create_fractal(char* line){
@@ -103,6 +101,32 @@ struct fractal* create_fractal(char* line){
 	}
     
 	return fractal_new(attr[0],atoi(attr[1]),atoi(attr[2]),atof(attr[3]),atof(attr[4])); // Creation d'une nouvelle fractale
+}
+
+
+int add_buffer(struct fractal* frac){
+	
+	for(int i=0;i<bufsize;i++){
+		if(*(buffer+i) == NULL){
+			*(buffer+i) = frac;
+			return 0;
+		}
+	}
+	return 1;
+}
+
+
+
+struct fractal* remove_buffer(){
+    
+	for(int i=0;i<bufsize;i++){
+		if(*(buffer+i) != NULL){
+			struct fractal* temp = *(buffer+i);
+			*(buffer+i) = NULL;
+			return temp;
+		}
+	}
+	return NULL;
 }
 
 
@@ -123,9 +147,9 @@ int buffer_empty(){
  * @return: la valeur moyenne de la fractale sur chaque pixel
  */
 
-int calcul_moyenne(struct fractal *frac){
+double calcul_moyenne(struct fractal *frac){
     
-	unsigned long sum;
+	unsigned long r;
 	unsigned int width = fractal_get_width(frac); // Variable qui contient la largeur de la fractale
 	unsigned int height = fractal_get_height(frac); // Variable qui contient la hauteur de la fractale
     
@@ -133,11 +157,11 @@ int calcul_moyenne(struct fractal *frac){
 	for(unsigned int i = 0; i < width; i++){
         
 		for(unsigned int j = 0; j < height; j++){
-            
-			sum += fractal_compute_value(frac,i,j);
+			r = r + fractal_compute_value(frac,i,j);
+			//printf("r = %li\n",r);
 		}
 	}
-	return sum / (width * height);
+	return ((double)r)/((double)(width*height));
 }
 
 /*
@@ -151,19 +175,15 @@ void max_fractale(struct fractal *frac){
     
     double moy = calcul_moyenne(frac);
     
+	pthread_mutex_lock(&mutex_max);
 	if(moy>=max){
         
         max = moy;
-        struct noeud * n = createNoeud(frac_max);
-        
-        if (*head == NULL){
-            *head = createNoeud(frac_max); // C'est le premier noeud, on cree la pile
-        }
-        
-        else {
-            push(head,n); // On ajoute cette fractale a la pile pour qu'elle soit affichee par la suite
-        }
+        struct noeud * n = createNoeud(frac);
+        int err = push(head,n);
+		
 	}
+	pthread_mutex_unlock(&mutex_max);
 }
 
 
@@ -174,12 +194,12 @@ void max_fractale(struct fractal *frac){
  * @return: 0 si la fonction a execute le code avec succes, 1 sinon
  */
 
-void* producteur(struct arg_struct* args){
+void* producteur(char* fname){
 	int* error = (int*)malloc(sizeof(int));
 	int* success = (int*)malloc(sizeof(int));
 	*error = 1;
 	*success = 0;
-    FILE *stream = fopen(args->line,"r");
+    FILE *stream = fopen(fname,"r");
     
     // On teste si la fonction fopen a echoue
 	if(stream == NULL){
@@ -208,6 +228,17 @@ void* producteur(struct arg_struct* args){
 		
 			err = add_buffer(fra);
 			printf("Fractale ajoutée au buffer\n");
+			
+			// Affichage du buffer
+			for(int i=0;i<bufsize;i++){
+				if(*(buffer+i)==NULL){
+					printf("Fractale à la position %i : NULL\n",i+1);
+				}
+				else{
+					printf("Fractale à la position %i : %s\n",i+1,fractal_get_name(*(buffer+i)));
+				}
+			}
+						
         	// Fin de la section critique
 			pthread_mutex_unlock(&mutex_buffer); // On debloque le mutex
         	sem_post(&full);
@@ -226,55 +257,30 @@ void* producteur(struct arg_struct* args){
  * @return: 0 si la fonction a execute le code avec succes, 1 sinon
  */
 
-void* consommateur (){
+void* consommateur (int* d){
 	int* error = (int*)malloc(sizeof(int));
-	int* success = (int*)malloc(sizeof(int));
 	*error = 1;
-	*success = 0;
-	struct fractal* frac = (struct fractal*)malloc(sizeof(struct fractal));
-    
-    // On teste si le malloc renvoie une erreur ou ne s'est pas execute correctement
-    if (frac == NULL){
-        return error;
-    }
-    
-    for(int i=0;i<7;i++){
+    int val;
+	int *sval = &val;
+	*error = sem_getvalue(&full,sval);
+    while(lecture != 0 || *sval != 0){
         sem_wait(&full);
         pthread_mutex_lock(&mutex_buffer); // On protege la section critique avec un mutex qu'on bloque
         // Section critique
-        frac = remove_buffer();
-        printf("Fractale enlevée : %s\n",fractal_get_name(frac);
+		struct fractal* frac = remove_buffer();
+        printf("Fractale enlevée : %s\n",fractal_get_name(frac));
         // Fin de la section critique
         pthread_mutex_unlock(&mutex_buffer); // On debloque le mutex
-        sem_post(&empty);
+		sem_post(&empty);
+		max_fractale(frac);
+		if(*d == 1){
+			int err = write_bitmap_sdl(frac,fractal_get_name(frac));
+		}
+		*error = sem_getvalue(&full,sval);
     }
     return success;
 }
 
-
-/*
- * max_fractale : Fonction qui affiche les fractales dont la valeur moyenne sur tous les pixels est maximale dans des fichiers de sortie. Le noeud de la pile est libere apres chaque affichage.
- *
- * @head : Tete de la pile
- * @destination : fichier de sortie sur lequel on va afficher une fractale
- * @return: /
- */
-
-void frac_affiche(struct noeud ** head, char* destination){
-    
-    if (head == NULL){
-        return; // On ne peut rien retourner car c'est une fonction void
-    }
-    
-    struct noeud * runner = *head; // Pointeur qui va parcourir la pile
-    
-    while (*head != NULL){ // Si la pile contient un ou plusieurs éléments
-        write_bitmap_sdl((*head)->fract, destination);
-        pop(head);
-        runner = runner->next;
-        
-    }
-}
 
 
 /*
@@ -285,21 +291,22 @@ void frac_affiche(struct noeud ** head, char* destination){
  * @return: 0 si la fonction a execute le code avec succes, 1 sinon
  */
 
-int main(int argc, char *argv[]){
+int main(int argc, char *argv[]) {
 	
 	head = (struct noeud**)malloc(sizeof(struct noeud*));
 	*head = (struct noeud*)malloc(sizeof(struct noeud));
-    
+	
 	int nfichiers = argc-2;
 	char* destination = argv[argc-1];
-	int d = 0;
+	int dval = 0;
+	int *d = &dval;
 	int maxthreads = 5;
 	
 	// Prise en compte des arguments de la main
 	for(int i = 1;i<argc;i++){
         
 		if(strcmp(argv[i],"-d") == 0){
-			d = 1;
+			*d = 1;
 			nfichiers = nfichiers-1;
 		}
         
@@ -308,6 +315,8 @@ int main(int argc, char *argv[]){
 			nfichiers = nfichiers-2;
 		}
 	}
+	
+	printf("Nombre de fichiers à lire : %i\n",nfichiers);
 	
 	// Création du tableau de fichiers d'entrée
 	char* fichiers[nfichiers];
@@ -331,39 +340,40 @@ int main(int argc, char *argv[]){
 		}
 	}
 	
-	// Threads de lecture
-	
-	int err = pthread_mutex_init(&(mutex_buffer),NULL);
-	err = pthread_mutex_init(&mutex_max,NULL);
-	err = sem_init(&empty,0,10);
-	err = sem_init(&full,0,0);
-	
-	struct arg_struct **args = (struct arg_struct**)malloc(sizeof(struct arg_struct*)*nfichiers);
-	for(int i=0;i<nfichiers;i++){
-		*(args+i) = (struct arg_struct*)malloc(sizeof(struct arg_struct));
+	for(int i = 0;i<nfichiers;i++){
+		printf("Fichier n.%i : %s\n",i+1,fichiers[i]);
 	}
 	
-	pthread_t threads_lecture[nfichiers];
-    
+	// Initialisation des mutex et sémaphores
+	int err = pthread_mutex_init(&(mutex_buffer),NULL);
+	err = pthread_mutex_init(&(mutex_max),NULL);
+	err = pthread_mutex_init(&(mutex_lecture),NULL);
+	err = sem_init(&empty,0,bufsize);
+	err = sem_init(&full,0,0);
+	
+	
+	// Threads de lecture
+	pthread_t threads[nfichiers];
 	for(int i = 0;i<nfichiers;i++){
-        
-		err = pthread_create(&(threads_lecture[i]),NULL,&(producteur),*(args+i));
-        
+		err = pthread_create(&(threads[i]),NULL,&producteur,fichiers[i]);
 		if(err != 0){
 			printf("Erreur lors de la création des threads de lecture\n");
 			return 1;
 		}
+		pthread_mutex_lock(&mutex_lecture);
+		lecture++;
+		pthread_mutex_unlock(&mutex_lecture);
 	}
-	
+
 	for(int i=0;i<nfichiers;i++){
-        
-		int *r;
-		err = pthread_join(threads_lecture[i],(void**)&r);
-        
+		err = pthread_join(threads[i],NULL);
 		if(err != 0){
 			printf("Erreur dans la fonction pthread_join\n");
 			return 1;
 		}
+		pthread_mutex_lock(&mutex_lecture);
+		lecture--;
+		pthread_mutex_unlock(&mutex_lecture);
 	}
 	
 	// Threads de calcul
@@ -371,7 +381,7 @@ int main(int argc, char *argv[]){
     
 	for(int i = 0;i<maxthreads;i++){
         
-		err = pthread_create(&(threads_calcul[i]),NULL,&(consommateur),NULL);
+		err = pthread_create(&(threads_calcul[i]),NULL,&(consommateur),(void*)d);
         
 		if(err != 0){
 			printf("Erreur lors de la création des threads de calcul\n");
@@ -389,5 +399,28 @@ int main(int argc, char *argv[]){
 			return 1;
 		}
 	}
-	return 0;
+	
+	// Destruction des mutex et sémaphores
+	pthread_mutex_destroy(&mutex_buffer);
+	pthread_mutex_destroy(&mutex_max);
+	sem_destroy(&full);
+	sem_destroy(&empty);
+	
+	// Affichage des fractales
+	struct noeud* runner = *head;
+	int k = 0;
+	while(runner != NULL && runner->fract != NULL){
+		char* fname = (char*)malloc(sizeof(char)*100);
+		if(k==0){
+			fname = destination;
+		}
+		else{
+			err = sprintf(fname,"%s(%i)",destination,k);
+		}
+		err = write_bitmap_sdl(runner->fract,fname);
+		runner = runner->next;
+	}
+	
+	
+	return err;
 }
