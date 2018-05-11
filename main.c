@@ -103,6 +103,17 @@ struct fractal* create_fractal(char* line){
 	return fractal_new(attr[0],atoi(attr[1]),atoi(attr[2]),atof(attr[3]),atof(attr[4])); // Creation d'une nouvelle fractale
 }
 
+
+
+int buffer_empty(){
+	for(int i=0;i<bufsize;i++){
+		if(*(buffer+i) != NULL){
+			return 0;
+		}
+	}
+	return 1;
+}
+
 /*
  * calcul_moyenne : Fonction qui calcule la moyenne de la valeur  d'une fractale sur chaque pixel.
  *

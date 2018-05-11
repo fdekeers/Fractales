@@ -12,13 +12,12 @@ pthread_mutex_t mutex_buffer;
 pthread_mutex_t mutex_lecture;
 sem_t empty;
 sem_t full;
+struct fractal *buffer[100] = {NULL};
 int bufsize = 100;
-struct noeud **head;
 int lecture = 0;
 
 
 int readline(FILE* stream, char* buf){
-    
 	int i = 0;
 	char temp = fgetc(stream);
 	if(temp == EOF){
@@ -80,13 +79,36 @@ struct fractal* create_fractal(char* line){
 }
 
 int add_buffer(struct fractal* frac){
-	struct noeud* noeud = createNoeud(frac);
-	return push(head,noeud);
+	
+	for(int i=0;i<bufsize;i++){
+		if(*(buffer+i) == NULL){
+			*(buffer+i) = frac;
+			return 0;
+		}
+	}
+	return 1;
 }
 
 
 struct fractal* remove_buffer(){
-    return pop(head);
+    
+	for(int i=0;i<bufsize;i++){
+		if(*(buffer+i) != NULL){
+			struct fractal* temp = *(buffer+i);
+			*(buffer+i) = NULL;
+			return temp;
+		}
+	}
+	return NULL;
+}
+
+int buffer_empty(){
+	for(int i=0;i<bufsize;i++){
+		if(*(buffer+i) != NULL){
+			return 0;
+		}
+	}
+	return 1;
 }
 
 
@@ -108,12 +130,12 @@ double calcul_moyenne(struct fractal *frac){
 }
 	
 
-void* producteur(struct arg_struct* args){
+void* producteur(char* fname){
 	int* error = (int*)malloc(sizeof(int));
 	int* success = (int*)malloc(sizeof(int));
 	*error = 1;
 	*success = 0;
-    FILE *stream = fopen(args->line,"r");
+    FILE *stream = fopen(fname,"r");
     
     // On teste si la fonction fopen a echoue
 	if(stream == NULL){
@@ -140,7 +162,7 @@ void* producteur(struct arg_struct* args){
 			pthread_mutex_lock(&mutex_buffer); // On protege la section critique avec un mutex qu'on bloque
         	// Section critique
 		
-			err = push(head,createNoeud(fra));
+			err = add_buffer(fra);
 			printf("Fractale ajoutée au buffer\n");
         	// Fin de la section critique
 			pthread_mutex_unlock(&mutex_buffer); // On debloque le mutex
@@ -157,20 +179,13 @@ void* consommateur (){
 	int* success = (int*)malloc(sizeof(int));
 	*error = 1;
 	*success = 0;
-	struct fractal* frac = (struct fractal*)malloc(sizeof(struct fractal));
     
-    // On teste si le malloc renvoie une erreur ou ne s'est pas execute correctement
-    if (frac == NULL){
-        return error;
-    }
-    
-    while(1==1){
+    while((buffer_empty() != 1) || (lecture != 0)){
         sem_wait(&full);
         pthread_mutex_lock(&mutex_buffer); // On protege la section critique avec un mutex qu'on bloque
         // Section critique
-        frac = pop(head);
+		struct fractal* frac = remove_buffer();
         printf("Fractale enlevée : %s\n",fractal_get_name(frac));
-		printf("Head : %s\n",fractal_get_name((*head)->fract));
         // Fin de la section critique
         pthread_mutex_unlock(&mutex_buffer); // On debloque le mutex
         sem_post(&empty);
@@ -179,20 +194,6 @@ void* consommateur (){
 }
 
 int main(int argc, char *argv[]) {
-	
-	head = (struct noeud**)malloc(sizeof(struct noeud*));
-	*head = (struct noeud*)malloc(sizeof(struct noeud));
-	*head = createNoeud(create_fractal(argv[1]));
-	printf("head : %s\n",fractal_get_name((*head)->fract));
-	struct fractal* frac = pop(head);
-	printf("Fractale enlevée : %s\n",fractal_get_name(frac));
-	if(head == NULL){
-		printf("head == NULL\n");
-	}
-	
-	/*
-    head = (struct noeud**)malloc(sizeof(struct noeud*));
-	*head = (struct noeud*)malloc(sizeof(struct noeud));
 	
 	
 	int nfichiers = argc-2;
@@ -249,17 +250,9 @@ int main(int argc, char *argv[]) {
 	err = sem_init(&empty,0,bufsize);
 	err = sem_init(&full,0,0);
 	
-	struct arg_struct **args = (struct arg_struct**)malloc(sizeof(struct arg_struct*)*nfichiers);
-	for(int i=0;i<nfichiers;i++){
-		*(args+i) = (struct arg_struct*)malloc(sizeof(struct arg_struct));
-	}
-	printf("coucou\n");
 	pthread_t threads[nfichiers];
-	printf("coucou\n");
 	for(int i = 0;i<nfichiers;i++){
-		(*(args+i))->line = fichiers[i];
-		(*(args+i))->head = head;
-		err = pthread_create(&(threads[i]),NULL,&producteur,*(args+i));
+		err = pthread_create(&(threads[i]),NULL,&producteur,fichiers[i]);
 		if(err != 0){
 			printf("Erreur lors de la création des threads de lecture\n");
 			return 1;
@@ -277,7 +270,8 @@ int main(int argc, char *argv[]) {
 			return 1;
 		}
 		pthread_mutex_lock(&mutex_lecture);
-		lecture = lecture - 2;
+		lecture--;
+		printf("Lecture = %i\n",lecture);
 		pthread_mutex_unlock(&mutex_lecture);
 	}
 	
@@ -307,7 +301,7 @@ int main(int argc, char *argv[]) {
 	
 	sem_destroy(&full);
 	sem_destroy(&empty);
-	*/
+	
 	
 	return 0;
 }
