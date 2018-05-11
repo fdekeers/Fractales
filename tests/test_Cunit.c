@@ -24,7 +24,10 @@ int main(int argc, char *argv[])
              (NULL == CU_add_test(pSuite, "Test assert equal", test_fractale_get_b))
              (NULL == CU_add_test(pSuite, "Test assert equal", test_push))||
              (NULL == CU_add_test(pSuite, "Test assert equal", test_pop))||
-             (NULL == CU_add_test(pSuite, "Test assert ptr null", test_remove_buffer))){
+             (NULL == CU_add_test(pSuite, "Test assert ptr null", test_remove_buffer))||
+             (NULL == CU_add_test(pSuite, "Test assert ptr not null", test_add_buffer))||
+             (NULL == CU_add_test(pSuite, "Test assert equal", test_buffer_empty1))||
+             (NULL == CU_add_test(pSuite, "Test assert equal", test_buffer2))){
         CU_cleanup_registry(); // On libere le registre qui a ete cree
         return CU_get_error(); // Si il y a eu un problème on retourne le code d'erreur
     }
@@ -110,10 +113,12 @@ void test_pop(void){
     fractal_free(frac_test1);
 }
 
-// Test de la fonction buffer_empty()
+// Test de la fonction remove_empty()
 void test_remove_buffer(void){
     struct fractal * buffer;
+    struct fractal * frac_test;
         if(NULL!=buffer){
+            add_buffer(frac_test);
             remove_buffer();
             CU_ASSERT_PTR_NULL(buffer);
     }
@@ -128,14 +133,14 @@ void test_add_buffer(void){
 }
 
 // Test de la fonction buffer_empty() (On teste pour un buffer vide)
-void test_buffer_empty(void){
+void test_buffer_empty1(void){
     struct fractal * buffer[10] = {NULL};
     int value = buffer_empty();
     CU_ASSERT_EQUAL(value,1);
 }
 
 // Test de la fonction buffer_empty() (On teste pour un buffer non vide)
-void test_buffer_empty(void){
+void test_buffer_empty2(void){
     struct fractal * buffer[10] = {NULL};
     struct fractal * frac_test;
     add_buffer(frac_test);
