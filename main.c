@@ -275,6 +275,7 @@ void* consommateur (int* d){
 		max_fractale(frac);
 		if(*d == 1){
 			int err = write_bitmap_sdl(frac,fractal_get_name(frac));
+			printf("Affiche la fractale");
 		}
 		*error = sem_getvalue(&full,sval);
     }
