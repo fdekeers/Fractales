@@ -19,8 +19,8 @@ pthread_mutex_t mutex_max;
 pthread_mutex_t mutex_lecture;
 sem_t empty;
 sem_t full;
-struct fractal *buffer[10] = {NULL};
-int bufsize = 10;
+struct fractal *buffer[100] = {NULL};
+int bufsize = 100;
 int lecture = 0;
 struct noeud **head;
 
@@ -278,7 +278,7 @@ void* consommateur (int* d){
 		}
 		*error = sem_getvalue(&full,sval);
     }
-    return success;
+    return error;
 }
 
 
@@ -355,7 +355,7 @@ int main(int argc, char *argv[]) {
 	// Threads de lecture
 	pthread_t threads[nfichiers];
 	for(int i = 0;i<nfichiers;i++){
-		err = pthread_create(&(threads[i]),NULL,&producteur,fichiers[i]);
+		err = pthread_create(&(threads[i]),NULL,&producteur,(void*)fichiers[i]);
 		if(err != 0){
 			printf("Erreur lors de la création des threads de lecture\n");
 			return 1;
@@ -412,10 +412,10 @@ int main(int argc, char *argv[]) {
 	while(runner != NULL && runner->fract != NULL){
 		char* fname = (char*)malloc(sizeof(char)*100);
 		if(k==0){
-			fname = destination;
+			err = sprintf(fname,"%s.bmp",destination);
 		}
 		else{
-			err = sprintf(fname,"%s(%i)",destination,k);
+			err = sprintf(fname,"%s(%i).bmp",destination,k);
 		}
 		err = write_bitmap_sdl(runner->fract,fname);
 		runner = runner->next;

@@ -1,0 +1,627 @@
+commit ab3f835efc4c049d0140d8ea02bf54c1eb563689
+Author: François De Keersmaeker <francoisdekeersmaeker8@gmail.com>
+Date:   Fri May 11 15:09:17 2018 +0200
+
+    Rajouté fonctions buffer
+
+ main.c | 195 ++++++++++++++++++++++++++++++++++++++---------------------------
+ 1 file changed, 114 insertions(+), 81 deletions(-)
+
+commit 721aacef11940f453e923e39a7f91c64ee03409c
+Author: François De Keersmaeker <francoisdekeersmaeker8@gmail.com>
+Date:   Fri May 11 11:39:21 2018 +0200
+
+    Amélioré main
+
+ libfractal/fractal.c | 13 ++++++------
+ main.c               | 28 ++++++++++++++------------
+ tests/test.c         | 56 ++++++++++++++++++++++++++++++++++++++++++++--------
+ 3 files changed, 70 insertions(+), 27 deletions(-)
+
+commit 5c00bbfa2b704e3e2622c1da3b98168ed5eb2093
+Author: François De Keersmaeker <francoisdekeersmaeker8@gmail.com>
+Date:   Fri May 11 09:05:16 2018 +0200
+
+    Tests
+
+ tests/test.c | 16 ++++++++++++++--
+ 1 file changed, 14 insertions(+), 2 deletions(-)
+
+commit 76e413346fefedf4ae86cf93323d8e3065a8ce41
+Author: François De Keersmaeker <francoisdekeersmaeker8@gmail.com>
+Date:   Fri May 11 08:42:59 2018 +0200
+
+    Remise d'un tableau pour le buffer
+
+ main.c       | 11 +++++++++
+ tests/test.c | 78 ++++++++++++++++++++++++++++--------------------------------
+ 2 files changed, 47 insertions(+), 42 deletions(-)
+
+commit 686d126c2ba7795e0414f109f452e13962dc53c2
+Author: François De Keersmaeker <francoisdekeersmaeker8@gmail.com>
+Date:   Fri May 11 03:04:44 2018 +0200
+
+    Tests
+
+ Makefile     |  2 +-
+ main.c       | 38 +++++++++------------------
+ tests/test.c | 86 ++++++++++++++++++++++++++++++++++++++++++++++++++++++------
+ 3 files changed, 91 insertions(+), 35 deletions(-)
+
+commit cc995a01ca5e59501a74d53c3190a64eebbc168d
+Author: François De Keersmaeker <francoisdekeersmaeker8@gmail.com>
+Date:   Fri May 11 01:36:31 2018 +0200
+
+    Tests fonction de lecture
+
+ libfractal/fractal.c |  22 ++++---
+ libfractal/fractal.h |   4 +-
+ main.c               |  76 +++++++++++-------------
+ tests/Makefile       |   5 +-
+ tests/test.c         | 161 ++++++++++++++++++++++++++++-----------------------
+ 5 files changed, 141 insertions(+), 127 deletions(-)
+
+commit 4f6223b681dd01933c05b744e5d153ffe695a995
+Merge: 672d526 95b3cfd
+Author: François De Keersmaeker <francoisdekeersmaeker8@gmail.com>
+Date:   Thu May 10 21:15:36 2018 +0200
+
+    Merge branch 'master' of github.com:GrosPoulet42/Fractales
+    ok
+
+commit 672d526e09cf569e8a1dbc8015ebc4ed71595de0
+Author: François De Keersmaeker <francoisdekeersmaeker8@gmail.com>
+Date:   Thu May 10 21:15:11 2018 +0200
+
+    Testé threads de lecture
+
+ main.c                      |  6 ++--
+ tests/{fichier => fichier1} |  0
+ tests/fichier2              |  3 ++
+ tests/fichier3              |  3 ++
+ tests/fichier4              |  1 +
+ tests/test.c                | 80 ++++++++++++++++++++++++++++++++-------------
+ 6 files changed, 68 insertions(+), 25 deletions(-)
+
+commit 95b3cfd389995ca9f2a85d480e47c2de44653f31
+Author: Margaux GERARD <margaux.gerard@student.uclouvain.be>
+Date:   Thu May 10 12:00:44 2018 +0200
+
+    Cunit test pile
+
+ .DS_Store          | Bin 6148 -> 6148 bytes
+ tests/.DS_Store    | Bin 6148 -> 6148 bytes
+ tests/test_Cunit.c |  31 +++++++++++++++++++++++++++++++
+ 3 files changed, 31 insertions(+)
+
+commit 56295e79212f721bb7faad8323fdf8d3dc8f528a
+Author: François De Keersmaeker <francoisdekeersmaeker8@gmail.com>
+Date:   Thu May 10 10:16:40 2018 +0200
+
+    Amélioration des fonctions de gestion du buffer
+
+ main.c       | 23 +++++++++++------------
+ tests/test.c | 23 ++++++++---------------
+ 2 files changed, 19 insertions(+), 27 deletions(-)
+
+commit dd51110df7af733e1a412b6bb57f6e5c029d0bc0
+Author: François De Keersmaeker <francoisdekeersmaeker8@gmail.com>
+Date:   Thu May 10 10:10:01 2018 +0200
+
+    Tests sur la fonction consommateur
+
+ libfractal/fractal.h |   5 +++
+ tests/test.c         | 104 ++++++++++++++++++++++++++++++++++++---------------
+ 2 files changed, 78 insertions(+), 31 deletions(-)
+
+commit 535d7dd5fcdda0e9cc6c49dedadd49b94c4c488b
+Author: François De Keersmaeker <francoisdekeersmaeker8@gmail.com>
+Date:   Thu May 10 00:12:47 2018 +0200
+
+    Testé la pile
+
+ tests/test.c | 18 +++++++++++++++++-
+ 1 file changed, 17 insertions(+), 1 deletion(-)
+
+commit af68b2918086a64b4420b776b4986784e4b760fd
+Author: François De Keersmaeker <francoisdekeersmaeker8@gmail.com>
+Date:   Wed May 9 23:06:50 2018 +0200
+
+    Testé différentes fonctions
+
+ libfractal/fractal.c |   3 ++
+ tests/fichier        |  21 ++-------
+ tests/test.c         |  85 ++++++++++++++-------------------
+ tests/testBuffer.c   | 130 +++++++++++++++++++++++++++++++++++++++++++++++++++
+ 4 files changed, 173 insertions(+), 66 deletions(-)
+
+commit 945b201d8425fdb7f77cb8f70b57d9042207fefe
+Merge: 874bd6c 2a479b7
+Author: François De Keersmaeker <francoisdekeersmaeker8@gmail.com>
+Date:   Wed May 9 14:14:04 2018 +0200
+
+    Merge branch 'master' of github.com:GrosPoulet42/Fractales
+    
+    Message
+
+commit 874bd6cb4dcb657d33ccc60567f1b38e241cacc5
+Author: François De Keersmaeker <francoisdekeersmaeker8@gmail.com>
+Date:   Wed May 9 14:08:41 2018 +0200
+
+    Testé certaines fonctions
+
+ Makefile              |   2 +-
+ main.c                |   2 +
+ tests/fichier         |   4 +-
+ tests/test.c          |  66 ++++++++++++++++++++++++++-----
+ tests/testReadLine.c  |  39 -------------------
+ tests/test_readline.c | 106 ++++++++++++++++++++++++++++++++++++++++++++++++++
+ 6 files changed, 169 insertions(+), 50 deletions(-)
+
+commit 2a479b7bfde20b138dc40aabd51c306ded05bfec
+Author: Margaux GERARD <margaux.gerard@student.uclouvain.be>
+Date:   Wed May 9 14:02:52 2018 +0200
+
+    test push et pop
+
+ .DS_Store        | Bin 6148 -> 6148 bytes
+ tests/.DS_Store  | Bin 6148 -> 6148 bytes
+ tests/testPop.c  |  47 +++++++++++++++++++++++++++++++++++++++++++++++
+ tests/testPush.c |  30 ++++++++++++++++++++++++++++++
+ 4 files changed, 77 insertions(+)
+
+commit ea1f8a5ae318fd2745bccd615e737a8a8aa28b25
+Author: François De Keersmaeker <francoisdekeersmaeker8@gmail.com>
+Date:   Wed May 9 11:57:14 2018 +0200
+
+    Amélioré fonction readline
+
+ Makefile             |   4 +-
+ libfractal/Makefile  |   2 +-
+ libfractal/fractal.c |   4 +-
+ libfractal/fractal.h |   6 +--
+ main.c               |  40 ++++++++++-----
+ tests/Makefile       |  19 +++++--
+ tests/fichier        |  14 ++++--
+ tests/test.c         | 136 ++++++++++++++++++++++++++++++++++-----------------
+ 8 files changed, 150 insertions(+), 75 deletions(-)
+
+commit 191dbea577d066676d6011fa79191492f704c262
+Author: François De Keersmaeker <francoisdekeersmaeker8@gmail.com>
+Date:   Tue May 8 19:29:33 2018 +0200
+
+    Corrigé les erreurs de compilation
+
+ Makefile |  4 ++--
+ main.c   | 24 +++++++++++++++---------
+ 2 files changed, 17 insertions(+), 11 deletions(-)
+
+commit 23848196c337d9dbebd9b8674d576661991cc15a
+Author: François De Keersmaeker <francoisdekeersmaeker8@gmail.com>
+Date:   Tue May 8 16:45:19 2018 +0200
+
+    Corrigé les erreurs de compilation
+
+ libfractal/fractal.c |  36 +++--
+ libfractal/fractal.h |  32 ++--
+ libfractal/tools.c   |   2 +-
+ main.c               | 407 ++++++++++++++++++++++++++-------------------------
+ 4 files changed, 243 insertions(+), 234 deletions(-)
+
+commit ca557f56f993696d272ab97eb2ee3a863f91c37b
+Author: François De Keersmaeker <francoisdekeersmaeker8@gmail.com>
+Date:   Tue May 8 13:18:10 2018 +0200
+
+    Correction des fonctions de la pile
+
+ libfractal/fractal.c | 11 ++++-------
+ main.c               | 10 +++++-----
+ 2 files changed, 9 insertions(+), 12 deletions(-)
+
+commit 234cdf6b421dce16f8e0504bd559f0c44e4e2867
+Author: Margaux GERARD <margaux.gerard@student.uclouvain.be>
+Date:   Tue May 8 11:18:00 2018 +0200
+
+    Code propre
+
+ libfractal/fractal.c |  22 +++--
+ libfractal/fractal.h |   4 +-
+ main.c               | 221 +++++++++++++++++++++++++++++++++++++++------------
+ 3 files changed, 184 insertions(+), 63 deletions(-)
+
+commit 1f5e90dbed27899533df1ca9ba266f1aaa02e18e
+Author: Margaux GERARD <margaux.gerard@student.uclouvain.be>
+Date:   Tue May 8 10:23:42 2018 +0200
+
+    Correction de la pile
+
+ .DS_Store            | Bin 6148 -> 6148 bytes
+ libfractal/fractal.c |  29 +++++++++++++++++------------
+ libfractal/fractal.h |  11 +++++++----
+ main.c               |  19 ++++++++++++-------
+ 4 files changed, 36 insertions(+), 23 deletions(-)
+
+commit ed527d5eae5d584ba93f0d60db84f241007b0357
+Author: François De Keersmaeker <francoisdekeersmaeker8@gmail.com>
+Date:   Mon May 7 21:29:37 2018 +0200
+
+    Fonction main.c : utilisation des threads
+
+ main.c | 41 +++++++++++++++++++++++++++++++++--------
+ 1 file changed, 33 insertions(+), 8 deletions(-)
+
+commit d42e0c4bb642290d4082a5f1fe47c2df17bccdec
+Author: François De Keersmaeker <francoisdekeersmaeker8@gmail.com>
+Date:   Mon May 7 13:36:47 2018 +0200
+
+    Update main.c : création des threads de lecture
+
+ main.c | 8 ++++++++
+ 1 file changed, 8 insertions(+)
+
+commit 3f32a445d131335228f05961035cb6dbd6fd5150
+Author: François De Keersmaeker <francoisdekeersmaeker8@gmail.com>
+Date:   Mon May 7 11:54:10 2018 +0200
+
+    Update main.c : création d'un tableau contenant tous les fichiers d'entrée
+
+ main.c       | 26 ++++++++++++++---
+ tests/test.c | 91 +++++++++++++++++++++++++++++++-----------------------------
+ 2 files changed, 69 insertions(+), 48 deletions(-)
+
+commit 4dafbf928711ecc995ad2804e3b995bab9397fe9
+Author: François De Keersmaeker <francoisdekeersmaeker8@gmail.com>
+Date:   Mon May 7 08:28:43 2018 +0200
+
+    Amélioration des commentaires et de la fonction fractal_affiche
+
+ main.c | 13 +++++++------
+ 1 file changed, 7 insertions(+), 6 deletions(-)
+
+commit 4660cc218c5ae4a8d1692140d4d4d5784a05d5bf
+Author: François De Keersmaeker <francoisdekeersmaeker8@gmail.com>
+Date:   Sun May 6 23:41:01 2018 +0200
+
+    Corrigé l'en-tête
+
+ main.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+commit 560d93e768e766ee6c19abc3966f29f8c3be2a80
+Merge: c8c059c 7f7dd81
+Author: François De Keersmaeker <francoisdekeersmaeker8@gmail.com>
+Date:   Sun May 6 23:31:02 2018 +0200
+
+    Merge branch 'master' of github.com:GrosPoulet42/Fractales
+    
+    Update main.c
+
+commit c8c059c933afd974af5ed90e1f33ba4175d4842c
+Author: François De Keersmaeker <francoisdekeersmaeker8@gmail.com>
+Date:   Sun May 6 23:20:58 2018 +0200
+
+    Update main.c
+
+ main.c | 9 ++++++++-
+ 1 file changed, 8 insertions(+), 1 deletion(-)
+
+commit 7f7dd81c6cfe3e5ca067f3bfad09e377b1557316
+Author: Margaux GERARD <margaux.gerard@student.uclouvain.be>
+Date:   Sun May 6 23:01:57 2018 +0200
+
+    Commentaires
+
+ libfractal/fractal.c |  4 +++
+ libfractal/fractal.h |  4 +++
+ main.c               | 88 +++++++++++++++++++++++++---------------------------
+ 3 files changed, 51 insertions(+), 45 deletions(-)
+
+commit 56e98b43b4155d40661f458800b84cc12031a59c
+Author: Margaux GERARD <margaux.gerard@student.uclouvain.be>
+Date:   Sun May 6 22:35:22 2018 +0200
+
+    Changements structure
+
+ libfractal/fractal.c | 13 +++++++------
+ libfractal/fractal.h |  6 +++---
+ 2 files changed, 10 insertions(+), 9 deletions(-)
+
+commit a3f9c0a8dfa249db1f47f3174b938b60420c8f55
+Author: Margaux GERARD <margaux.gerard@student.uclouvain.be>
+Date:   Sun May 6 22:30:26 2018 +0200
+
+    Fonction affichage pile
+
+ .DS_Store            | Bin 6148 -> 6148 bytes
+ libfractal/fractal.h |   9 +++++----
+ main.c               |  50 +++++++++++++++++++++++++-------------------------
+ 3 files changed, 30 insertions(+), 29 deletions(-)
+
+commit 1efd2b010ef2833a7279f3503cb5850816440cff
+Author: François De Keersmaeker <francoisdekeersmaeker8@gmail.com>
+Date:   Sun May 6 21:27:47 2018 +0200
+
+    Update fonction readline
+
+ main.c        | 13 ++++++++++++-
+ tests/fichier | 10 ++++++++--
+ tests/test.c  | 58 +++++++++++++++++++++++++++++++++++++++++++++++-----------
+ 3 files changed, 67 insertions(+), 14 deletions(-)
+
+commit 0d272a2ff0b68b45289c12cdc037ae46e5ca8616
+Author: François De Keersmaeker <francoisdekeersmaeker8@gmail.com>
+Date:   Sun May 6 18:57:31 2018 +0200
+
+    Update main.c
+
+ main.c       | 16 +++++++++-------
+ tests/test.c |  5 ++++-
+ 2 files changed, 13 insertions(+), 8 deletions(-)
+
+commit 7241ddd918fcf46dfffad07a07da46ebde89a708
+Author: François De Keersmaeker <francoisdekeersmaeker8@gmail.com>
+Date:   Sun May 6 18:36:37 2018 +0200
+
+    Ajouté fonction remove_buffer et amélioré Makefile tests
+
+ main.c         | 20 +++++++++++++-------
+ tests/Makefile |  7 ++++++-
+ tests/test.c   | 20 ++++++++------------
+ 3 files changed, 27 insertions(+), 20 deletions(-)
+
+commit f08b2f6655a0403605e63d2b73e13120247a2d95
+Author: Margaux GERARD <margaux.gerard@student.uclouvain.be>
+Date:   Sun May 6 11:06:39 2018 +0200
+
+    Structure et fonctions de la pile
+
+ .DS_Store            | Bin 6148 -> 6148 bytes
+ libfractal/fractal.c |  55 +++++++++++++++++++++++++++++++++++++++++++++++++++
+ libfractal/fractal.h |  17 ++++++++++++++++
+ main.c               |   3 ++-
+ 4 files changed, 74 insertions(+), 1 deletion(-)
+
+commit 4f55ac70d3d8b88d01402973166b96e3fb1dd672
+Author: Margaux GERARD <margaux.gerard@student.uclouvain.be>
+Date:   Sun May 6 10:32:52 2018 +0200
+
+    Section critique du consommateur
+
+ main.c | 29 ++++++++---------------------
+ 1 file changed, 8 insertions(+), 21 deletions(-)
+
+commit 2fb6a33bce923fe04edc8ec0c5238e4d36dee958
+Author: Margaux GERARD <margauxgerard@MBP-de-Margaux.fritz.box>
+Date:   Sat May 5 14:37:03 2018 +0200
+
+    Tests Cunit
+
+ .DS_Store            | Bin 6148 -> 6148 bytes
+ libfractal/fractal.h |   1 +
+ main.c               |   9 +++++++
+ tests/.DS_Store      | Bin 0 -> 6148 bytes
+ tests/test_Cunit.c   |  73 +++++++++++++++++++++++++++++++++++++++++++++++++++
+ 5 files changed, 83 insertions(+)
+
+commit 94ae88b4619b662ca90968a99fe3c2b7312cca22
+Author: Margaux GERARD <margauxgerard@MacBook-Pro-de-Margaux.local>
+Date:   Fri May 4 13:02:11 2018 +0200
+
+    Commentaires
+
+ main.c | 10 ++++++----
+ 1 file changed, 6 insertions(+), 4 deletions(-)
+
+commit 8cc3a280c15cb2eeceb945a63eeb13cdb187f56d
+Author: François De Keersmaeker <francoisdekeersmaeker8@gmail.com>
+Date:   Fri May 4 12:01:22 2018 +0200
+
+    Update main.c
+
+ libfractal/fractal.c |  2 +-
+ libfractal/fractal.h |  1 -
+ main.c               | 33 ++++++++++++++++++++++-----------
+ 3 files changed, 23 insertions(+), 13 deletions(-)
+
+commit a5534ff6f48f77303a4737856094f6cc2064e868
+Author: GrosPoulet42 <38645001+GrosPoulet42@users.noreply.github.com>
+Date:   Fri May 4 11:05:11 2018 +0200
+
+    Update main.c
+
+ main.c | 112 ++++++++++++++++++++++++++++++++++++++---------------------------
+ 1 file changed, 66 insertions(+), 46 deletions(-)
+
+commit 251025c7473cfbc73e0d61ca837edf0e5c6ab1da
+Author: Margaux GERARD <margauxgerard@MacBook-Pro-de-Margaux.local>
+Date:   Thu May 3 19:46:55 2018 +0200
+
+    Fonction main
+
+ .DS_Store | Bin 6148 -> 6148 bytes
+ main.c    |  43 +++++++++++++++++++++++++++----------------
+ 2 files changed, 27 insertions(+), 16 deletions(-)
+
+commit 13827f47e0fe49dbd498c011a6eee1cfa5106058
+Author: Margaux GERARD <margauxgerard@MacBook-Pro-de-Margaux.local>
+Date:   Wed May 2 19:28:45 2018 +0200
+
+    Fonction de calcul
+
+ .DS_Store | Bin 6148 -> 6148 bytes
+ main.c    |  55 +++++++++++++++++++++++++++++++++++++++++--------------
+ 2 files changed, 41 insertions(+), 14 deletions(-)
+
+commit d61fc46087ea97d476c74ccfa6ed18e6c1875060
+Author: François De Keersmaeker <francoisdekeersmaeker8@gmail.com>
+Date:   Wed May 2 17:33:05 2018 +0200
+
+    Ajouté fonction create_fracal
+
+ libfractal/fractal.o | Bin 4960 -> 0 bytes
+ main.c               |  19 +++++++++----------
+ tests/test.c         |  41 ++++++++++++-----------------------------
+ tests/testReadLine.c |  39 +++++++++++++++++++++++++++++++++++++++
+ 4 files changed, 60 insertions(+), 39 deletions(-)
+
+commit 965aa5632c3394151c930cca4ede3e38a5b94ed1
+Author: François De Keersmaeker <francoisdekeersmaeker8@gmail.com>
+Date:   Wed May 2 16:45:36 2018 +0200
+
+    Ajouté fonction readline
+
+ main.c         | 29 +++++++++++++++--------------
+ tests/Makefile |  5 +++++
+ tests/fichier  |  3 +++
+ tests/test.c   | 39 +++++++++++++++++++++++++++++++++++++++
+ 4 files changed, 62 insertions(+), 14 deletions(-)
+
+commit e576e59627f23e8d695eaa0be3bfcdf3c0fc0515
+Author: François De Keersmaeker <francoisdekeersmaeker8@gmail.com>
+Date:   Mon Apr 30 23:44:20 2018 +0200
+
+    Créé méthodes dans le fichier main
+
+ main.c | 35 +++++++++++++++++++++++++++++++++++
+ 1 file changed, 35 insertions(+)
+
+commit da884ce1887bc05ac60707ec7ae7582eeae96cc2
+Author: GrosPoulet42 <38645001+GrosPoulet42@users.noreply.github.com>
+Date:   Mon Apr 30 21:00:03 2018 +0200
+
+    Ajout librairie sémaphores
+
+ main.c | 1 +
+ 1 file changed, 1 insertion(+)
+
+commit adf1e91544744c0f6111a4a0190a6d59529b7945
+Author: Margaux GERARD <margauxgerard@MacBook-Pro-de-Margaux.local>
+Date:   Thu Apr 26 17:58:13 2018 +0200
+
+    Main modifiéé
+
+ .DS_Store            | Bin 0 -> 6148 bytes
+ libfractal/fractal.o | Bin 0 -> 4960 bytes
+ main.c               |  61 +++++++++++++++++++++++++++++++++++++++++++++++++++
+ 3 files changed, 61 insertions(+)
+
+commit b2f58d8fb98cef749590d9f308d689ecfc085afc
+Author: François De Keersmaeker <francoisdekeersmaeker8@gmail.com>
+Date:   Thu Apr 26 14:36:03 2018 +0200
+
+    Ajout de la librairie de threads au Makefile et ajout de test de la fonction main
+
+ Makefile | 2 +-
+ main.c   | 2 +-
+ 2 files changed, 2 insertions(+), 2 deletions(-)
+
+commit 876d404320f14ab392e0a50d15f2791fecffc567
+Author: François De Keersmaeker <francoisdekeersmaeker8@gmail.com>
+Date:   Wed Apr 25 18:32:42 2018 +0200
+
+    Finition du makefile
+
+ Makefile            | 8 ++++----
+ libfractal/Makefile | 4 ++--
+ 2 files changed, 6 insertions(+), 6 deletions(-)
+
+commit dedcf544c10499a951685d6a1beb9f61dff00a66
+Author: François De Keersmaeker <francoisdekeersmaeker8@gmail.com>
+Date:   Wed Apr 25 18:06:42 2018 +0200
+
+    Ajout simple
+
+ Makefile | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+commit c6d4dfe4e7810ad4f97c3945586c43457592c4d0
+Author: François De Keersmaeker <francoisdekeersmaeker8@gmail.com>
+Date:   Wed Apr 25 17:55:39 2018 +0200
+
+    Ajouté le makefile général
+
+ Makefile                |  23 ++++++++++++++++++++++-
+ libfractal/Makefile     |   5 +++++
+ libfractal/fractal.o    | Bin 6072 -> 0 bytes
+ libfractal/libfractal.a | Bin 18474 -> 0 bytes
+ libfractal/tools.o      | Bin 11984 -> 0 bytes
+ 5 files changed, 27 insertions(+), 1 deletion(-)
+
+commit 69a36926990058e30080795c31c772f7eb95f8f5
+Author: François De Keersmaeker <francoisdekeersmaeker8@gmail.com>
+Date:   Wed Apr 25 12:14:06 2018 +0200
+
+    Remise au normal
+
+ README.md | 3 ---
+ 1 file changed, 3 deletions(-)
+
+commit 199e31d1dfe3edc3a6413839587ef54a167994ca
+Author: GrosPoulet42 <38645001+GrosPoulet42@users.noreply.github.com>
+Date:   Wed Apr 25 12:13:03 2018 +0200
+
+    Update README.md
+
+ README.md | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+commit 2c8ffc620ab090f8e73196d28f6418be5caeaed4
+Author: GrosPoulet42 <38645001+GrosPoulet42@users.noreply.github.com>
+Date:   Wed Apr 25 12:12:47 2018 +0200
+
+    Update README.md
+
+ README.md | 3 +++
+ 1 file changed, 3 insertions(+)
+
+commit 4f52d1bc5cbad59b708cc0c13c711583c4b836cb
+Author: François De Keersmaeker <francoisdekeersmaeker8@gmail.com>
+Date:   Wed Apr 25 12:09:16 2018 +0200
+
+    Oui
+
+ README.md | 2 ++
+ 1 file changed, 2 insertions(+)
+
+commit 8d948b779610effa5e12bd546ab3c5b8cdc09a6c
+Author: François De Keersmaeker <francoisdekeersmaeker8@gmail.com>
+Date:   Wed Apr 25 12:00:35 2018 +0200
+
+    Renommé fichiers
+
+ README.md | 2 --
+ 1 file changed, 2 deletions(-)
+
+commit 02deb842f85ac5c23bec4dfcfae9c2393aab9751
+Author: François De Keersmaeker <francoisdekeersmaeker8@gmail.com>
+Date:   Wed Apr 25 11:57:22 2018 +0200
+
+    Mis tous les dossiers et fichiers
+
+ libfractal/Makefile     |  15 +++++++
+ libfractal/fractal.c    |  56 +++++++++++++++++++++++
+ libfractal/fractal.h    | 117 ++++++++++++++++++++++++++++++++++++++++++++++++
+ libfractal/fractal.o    | Bin 0 -> 6072 bytes
+ libfractal/libfractal.a | Bin 0 -> 18474 bytes
+ libfractal/tools.c      | 103 ++++++++++++++++++++++++++++++++++++++++++
+ libfractal/tools.o      | Bin 0 -> 11984 bytes
+ 7 files changed, 291 insertions(+)
+
+commit 1a3cd9760804da72778a1b11a816a357007d7475
+Author: GrosPoulet42 <38645001+GrosPoulet42@users.noreply.github.com>
+Date:   Wed Apr 25 09:45:33 2018 +0200
+
+    Add files via upload
+
+ Makefile |  1 +
+ main.c   | 11 +++++++++++
+ 2 files changed, 12 insertions(+)
+
+commit de6da4cc52428865e067ceb1f5aaa69f06601e63
+Author: GrosPoulet42 <38645001+GrosPoulet42@users.noreply.github.com>
+Date:   Wed Apr 25 08:56:02 2018 +0200
+
+    Initial commit
+
+ README.md | 2 ++
+ 1 file changed, 2 insertions(+)

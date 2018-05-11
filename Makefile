@@ -16,7 +16,7 @@ lib:
 	@(cd $(LIB_DIR) && $(MAKE))
 
 clean:
-	@(rm -rf *.o $(EXE) && cd $(LIB_DIR) && rm -rf *.o *.a && cd ../tests && rm -rf *.o test)
+	@(rm -rf *.o $(EXE) *.bmp && cd $(LIB_DIR) && rm -rf *.o *.a && cd ../tests && rm -rf *.o test)
 	
 tests:
 	//A completer
