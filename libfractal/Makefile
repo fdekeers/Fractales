@@ -1,6 +1,6 @@
 CC=gcc
 AR=ar
-CFLAGS=-g -Wall -W -lSDL -I/usr/include/SDL
+CFLAGS=-g -Wall -W -lSDL -I/usr/include/SDL -std=c99
 LDFLAGS=
 SRC=fractal.c tools.c
 OBJ=$(SRC:.c=.o)

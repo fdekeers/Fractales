@@ -1,6 +1,7 @@
 export CC = gcc
-export CFLAGS = -g -Wall -W -lpthread -lSDL -I/usr/include/SDL -I libfractal
+export CFLAGS = -g -Wall -W -lpthread -lSDL -I/usr/include/SDL -I libfractal -std=c99
 LIB_DIR = libfractal
+TEST_DIR = tests
 LIB = ./libfractal/libfractal.a
 EXE = main
 
@@ -19,4 +20,4 @@ clean:
 	@(rm -rf *.o $(EXE) *.bmp && cd $(LIB_DIR) && rm -rf *.o *.a && cd ../tests && rm -rf *.o test)
 	
 tests:
-	//A completer
+	@(cd $(TEST_DIR) && $(MAKE))
