@@ -8,14 +8,16 @@
 #include <string.h>
 #include <SDL.h>
 
+double max;
 pthread_mutex_t mutex_buffer;
 pthread_mutex_t mutex_lecture;
+pthread_mutex_t mutex_max;
 sem_t empty;
 sem_t full;
 struct fractal *buffer[10] = {NULL};
 int bufsize = 10;
 int lecture = 0;
-
+struct noeud **head;
 
 int readline(FILE* stream, char* buf){
 	int i = 0;
@@ -114,20 +116,39 @@ int buffer_empty(){
 
 double calcul_moyenne(struct fractal *frac){
     
-	double r;
+	unsigned long r;
 	unsigned int width = fractal_get_width(frac); // Variable qui contient la largeur de la fractale
 	unsigned int height = fractal_get_height(frac); // Variable qui contient la hauteur de la fractale
     
     // On parcourt tous les pixels
-	for(unsigned int i = 1; i <= width; i++){
+	for(unsigned int i = 0; i < width; i++){
         
-		for(unsigned int j = 1; j <= height; j++){
-            
+		for(unsigned int j = 0; j < height; j++){
 			r = r + fractal_compute_value(frac,i,j);
+			//printf("r = %li\n",r);
 		}
 	}
-	return r/(width*height);
+	return ((double)r)/((double)(width*height));
 }
+
+
+
+void max_fractale(struct fractal *frac){
+    
+    double moy = calcul_moyenne(frac);
+    
+	pthread_mutex_lock(&mutex_max);
+	if(moy>=max){
+        
+        max = moy;
+        struct noeud * n = createNoeud(frac);
+        int err = push(head,n);
+		
+	}
+	pthread_mutex_unlock(&mutex_max);
+}
+
+
 	
 
 void* producteur(char* fname){
@@ -185,7 +206,7 @@ void* producteur(char* fname){
     return success;
 }
 
-void* consommateur (){
+void* consommateur (int d){
 	int* error = (int*)malloc(sizeof(int));
 	int* success = (int*)malloc(sizeof(int));
 	*error = 1;
@@ -200,6 +221,10 @@ void* consommateur (){
         printf("Fractale enlevée : %s\n",fractal_get_name(frac));
         // Fin de la section critique
         pthread_mutex_unlock(&mutex_buffer); // On debloque le mutex
+		max_fractale(frac);
+		if(d == 1){
+			int err = write_bitmap_sdl(frac,fractal_get_name(frac));
+		}
         sem_post(&empty);
     }
     return success;
@@ -314,6 +339,21 @@ int main(int argc, char *argv[]) {
 	sem_destroy(&full);
 	sem_destroy(&empty);
 	
+	// Affichage des fractales
+	struct noeud* runner = *head;
+	int k = 0;
+	while(runner != NULL && runner->fract != NULL){
+		char* fname = (char*)malloc(sizeof(char)*100);
+		if(k==0){
+			fname = destination;
+		}
+		else{
+			err = sprintf(fname,"%s(%i)",destination,k);
+		}
+		err = write_bitmap_sdl(runner->fract,fname);
+		runner = runner->next;
+	}
 	
-	return 0;
+	
+	return err;
 }

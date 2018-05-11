@@ -17,9 +17,9 @@ struct fractal *fractal_new(char *name, int width, int height, double a, double 
     fr->height = height;
     fr->a = a;
     fr->b = b;
-	fr->values = (double**)calloc(width,sizeof(double*));
-	for(int i=0;i<width;i++){
-		fr->values[i] = (double*)calloc(height,sizeof(double));
+	fr->values = (double**)malloc(sizeof(double*)*height);
+	for(int i=0;i<height;i++){
+		*((fr->values)+i) = (double*)malloc(sizeof(double)*width);
 	}
     return fr;
 }
@@ -115,12 +115,13 @@ struct fractal* pop(struct noeud **head){
     if (head==NULL) {
         return NULL;
     }
-    if (*head==NULL) {
+	if (*head==NULL){
         return NULL;
     }
     struct noeud * n = (*head);
-    if (n->next == NULL){
-		head = NULL;
+    if (n->next == NULL || (((*head)->next)->fract) == NULL){
+		(*head)->next = NULL;
+		*head = NULL;
         return n->fract;
     }
     (*head)=n->next;

@@ -14,13 +14,15 @@
 
 // Initialisations
 double max;
-struct fractal *frac_max;
-pthread_mutex_t mutex;
+pthread_mutex_t mutex_buffer;
+pthread_mutex_t mutex_lecture;
+pthread_mutex_t mutex_max;
 sem_t empty;
 sem_t full;
-int bufsize = 100;
-struct noeud **head_buffer;
-struct noeud **head_affiche;
+struct fractal *buffer[10] = {NULL};
+int bufsize = 10;
+int lecture = 0;
+struct noeud **head;
 
 
 /*
@@ -152,7 +154,6 @@ void max_fractale(struct fractal *frac){
 	if(moy>=max){
         
         max = moy;
-		frac_max = frac; // On stocke la fractale donc la valeur de la moyenne est maximale
         struct noeud * n = createNoeud(frac_max);
         
         if (*head == NULL){
@@ -202,13 +203,13 @@ void* producteur(struct arg_struct* args){
 		printf("Ligne lue : %s\n",line);
 			struct fractal* fra = create_fractal(line);
 			sem_wait(&empty); // On fait attendre la premiere semaphore
-			pthread_mutex_lock(&mutex); // On protege la section critique avec un mutex qu'on bloque
+			pthread_mutex_lock(&mutex_buffer); // On protege la section critique avec un mutex qu'on bloque
         	// Section critique
 		
 			err = add_buffer(fra);
 			printf("Fractale ajoutée au buffer\n");
         	// Fin de la section critique
-			pthread_mutex_unlock(&mutex); // On debloque le mutex
+			pthread_mutex_unlock(&mutex_buffer); // On debloque le mutex
         	sem_post(&full);
 			i++;
 		}
@@ -239,12 +240,12 @@ void* consommateur (){
     
     for(int i=0;i<7;i++){
         sem_wait(&full);
-        pthread_mutex_lock(&mutex); // On protege la section critique avec un mutex qu'on bloque
+        pthread_mutex_lock(&mutex_buffer); // On protege la section critique avec un mutex qu'on bloque
         // Section critique
         frac = remove_buffer();
         printf("Fractale enlevée : %s\n",fractal_get_name(frac);
         // Fin de la section critique
-        pthread_mutex_unlock(&mutex); // On debloque le mutex
+        pthread_mutex_unlock(&mutex_buffer); // On debloque le mutex
         sem_post(&empty);
     }
     return success;
@@ -286,8 +287,8 @@ void frac_affiche(struct noeud ** head, char* destination){
 
 int main(int argc, char *argv[]){
 	
-	head_buffer = (struct noeud**)malloc(sizeof(struct noeud*));
-	*head_buffer = (struct noeud*)malloc(sizeof(struct noeud));
+	head = (struct noeud**)malloc(sizeof(struct noeud*));
+	*head = (struct noeud*)malloc(sizeof(struct noeud));
     
 	int nfichiers = argc-2;
 	char* destination = argv[argc-1];
@@ -332,7 +333,8 @@ int main(int argc, char *argv[]){
 	
 	// Threads de lecture
 	
-	int err = pthread_mutex_init(&(mutex),NULL);
+	int err = pthread_mutex_init(&(mutex_buffer),NULL);
+	err = pthread_mutex_init(&mutex_max,NULL);
 	err = sem_init(&empty,0,10);
 	err = sem_init(&full,0,0);
 	
